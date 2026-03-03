@@ -15,23 +15,30 @@ def generate_response(
 ) -> str:
 
     messages = [
-      {
-        "role": "system",
-          "content": "You are a concise ML tutor. Start immediately with the explanation. Do not repeat, paraphrase or restate the question. Answer directly."},
+        {
+            "role": "system",
+            "content": "You are a concise ML tutor. "
+                       "Start immediately with the explanation. "
+                       "Do not repeat or restate the question."
+        },
         {
             "role": "user",
             "content": prompt
         }
     ]
 
-    input_ids = tokenizer.apply_chat_template(
+    inputs = tokenizer.apply_chat_template(
         messages,
-        return_tensors="pt"
-    ).to(model.device)
+        return_tensors="pt",
+        tokenize=True,
+        add_generation_prompt=True
+    )
+
+    inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
     with torch.no_grad():
         outputs = model.generate(
-            input_ids,
+            **inputs,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
@@ -39,8 +46,10 @@ def generate_response(
             pad_token_id=tokenizer.eos_token_id
         )
 
+    generated_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
+
     response = tokenizer.decode(
-        outputs[0][input_ids.shape[-1]:],
+        generated_tokens,
         skip_special_tokens=True
     )
 
