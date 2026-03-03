@@ -9,6 +9,7 @@ def generate_response(
     temperature: float = 0.7,
     top_p: float = 0.9,
 ) -> str:
+
     messages = [
         {
             "role": "system",
@@ -18,24 +19,30 @@ def generate_response(
                 "Do not repeat or restate the question."
             ),
         },
-        {"role": "user", "content": prompt},
+        {
+            "role": "user",
+            "content": prompt,
+        },
     ]
 
-    # 1) Получаем готовый чат-промпт как строку
+    # Получаем текст чата
     chat_text = tokenizer.apply_chat_template(
         messages,
         tokenize=False,
         add_generation_prompt=True,
     )
 
-    # 2) Токенизируем в тензоры
+    # Токенизация
     enc = tokenizer(chat_text, return_tensors="pt")
-    enc = {k: v.to(model.device) for k, v in enc.items()}
 
-    # 3) Генерация
+    # ВАЖНО: переносим input_ids вручную (4-bit безопасно)
+    input_ids = enc["input_ids"].to(model.device)
+    attention_mask = enc["attention_mask"].to(model.device)
+
     with torch.no_grad():
-        out = model.generate(
-            **enc,
+        outputs = model.generate(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
@@ -43,6 +50,10 @@ def generate_response(
             pad_token_id=tokenizer.eos_token_id,
         )
 
-    # 4) Берём только сгенерированное (без входа)
-    gen_tokens = out[0][enc["input_ids"].shape[-1] :]
-    return tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
+    # Берём только новую генерацию
+    generated_tokens = outputs[0][input_ids.shape[-1]:]
+
+    return tokenizer.decode(
+        generated_tokens,
+        skip_special_tokens=True
+    ).strip()

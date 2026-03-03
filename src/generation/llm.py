@@ -1,24 +1,10 @@
 from typing import Tuple
-
 import logging
 import torch
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    BitsAndBytesConfig,
-)
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 
 def setup_logger(name: str = "llm_project") -> logging.Logger:
-    """
-    Configure and return a logger instance.
-
-    Args:
-        name (str): Logger name.
-
-    Returns:
-        logging.Logger: Configured logger.
-    """
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
@@ -38,18 +24,7 @@ logger = setup_logger(__name__)
 
 def load_mistral_4bit(
     model_name: str = "mistralai/Mistral-7B-Instruct-v0.2",
-    device_map: str = "auto",
 ) -> Tuple[AutoTokenizer, AutoModelForCausalLM]:
-    """
-    Load Mistral 7B model in 4-bit quantized mode (QLoRA-ready).
-
-    Args:
-        model_name (str): HuggingFace model identifier.
-        device_map (str): Device allocation strategy.
-
-    Returns:
-        Tuple[AutoTokenizer, AutoModelForCausalLM]: tokenizer and model.
-    """
 
     logger.info("Initializing 4-bit quantization config.")
 
@@ -64,10 +39,11 @@ def load_mistral_4bit(
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     logger.info("Loading model in 4-bit mode.")
+
+    # ❗ Убрали device_map
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         quantization_config=bnb_config,
-        device_map=device_map,
         trust_remote_code=True,
     )
 
