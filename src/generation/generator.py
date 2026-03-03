@@ -1,43 +1,59 @@
-from typing import Tuple
-import logging
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-def setup_logger(name: str = "llm_project") -> logging.Logger:
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+def generate_response(
+    model,
+    tokenizer,
+    prompt: str,
+    max_new_tokens: int = 200,
+    temperature: float = 0.7,
+    top_p: float = 0.9,
+) -> str:
 
-    if not logger.handlers:
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
-        )
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a concise ML tutor. "
+                "Start immediately with the explanation. "
+                "Do not repeat or restate the question."
+            ),
+        },
+        {
+            "role": "user",
+            "content": prompt,
+        },
+    ]
 
-    return logger
-
-
-logger = setup_logger(__name__)
-
-
-def load_mistral_fp16(
-    model_name: str = "mistralai/Mistral-7B-Instruct-v0.2",
-) -> Tuple[AutoTokenizer, AutoModelForCausalLM]:
-
-    logger.info("Loading tokenizer.")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-    logger.info("Loading model in FP16 mode.")
-
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=torch.float16,
-        device_map="auto",
-        trust_remote_code=True,
+    # Получаем текст чата
+    chat_text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
     )
 
-    logger.info("Model loaded successfully.")
+    # Токенизация
+    enc = tokenizer(chat_text, return_tensors="pt")
 
-    return tokenizer, model
+    # ВАЖНО: переносим input_ids вручную (4-bit безопасно)
+    input_ids = enc["input_ids"].to(model.device)
+    attention_mask = enc["attention_mask"].to(model.device)
+
+    with torch.no_grad():
+        outputs = model.generate(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            do_sample=True,
+            pad_token_id=tokenizer.eos_token_id,
+        )
+
+    # Берём только новую генерацию
+    generated_tokens = outputs[0][input_ids.shape[-1]:]
+
+    return tokenizer.decode(
+        generated_tokens,
+        skip_special_tokens=True
+    ).strip()

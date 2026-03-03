@@ -3,24 +3,27 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
+dist/
+build/
+
+# Environments
+.env
+.venv
+env/
+ml/
+
+# Conda
+*.conda
 
 # Jupyter
-.ipynb_checkpoints
-
-# Data
-data/raw/
-data/processed/
-artifacts/
-results/
-
-# Models
-*.bin
-*.pt
-*.safetensors
+.ipynb_checkpoints/
 
 # Logs
-*.log
+logs/
 
-# Env
-.env
-venv/
+# Artifacts
+artifacts/
+
+# HuggingFace cache
+.cache/

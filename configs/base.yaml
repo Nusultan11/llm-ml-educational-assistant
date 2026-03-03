@@ -1,0 +1,21 @@
+project:
+  name: "llm-ml-assistant"
+  version: "0.1"
+
+model:
+  name: "mistralai/Mistral-7B-Instruct-v0.2"
+  device: "cuda"
+  max_tokens: 512
+
+embeddings:
+  name: "sentence-transformers/all-MiniLM-L6-v2"
+
+rag:
+  chunk_size: 512
+  chunk_overlap: 50
+  top_k: 3
+
+paths:
+  data_dir: "data"
+  artifacts_dir: "artifacts"
+  logs_dir: "logs"
