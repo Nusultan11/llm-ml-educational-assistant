@@ -15,12 +15,9 @@ def generate_response(
 ) -> str:
 
     messages = [
-        {
-            "role": "system",
-            "content": "You are a machine learning tutor. "
-                       "Explain clearly, directly and simply. "
-                       "Do not restate the question."
-        },
+      {
+        "role": "system",
+          "content": "You are a concise ML tutor. Start immediately with the explanation. Do not repeat, paraphrase or restate the question. Answer directly."},
         {
             "role": "user",
             "content": prompt
