@@ -14,7 +14,14 @@ def generate_response(
 ) -> str:
 
     messages = [
-        {"role": "user", "content": prompt}
+        {
+            "role": "system",
+            "content": "You are a machine learning tutor. Explain clearly and directly. Do not repeat the question."
+        },
+        {
+            "role": "user",
+            "content": prompt
+        }
     ]
 
     input_ids = tokenizer.apply_chat_template(
@@ -32,10 +39,9 @@ def generate_response(
             pad_token_id=tokenizer.eos_token_id
         )
 
-    decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    response = tokenizer.decode(
+        outputs[0][input_ids.shape[-1]:],
+        skip_special_tokens=True
+    )
 
-    # Удаляем prompt если модель его повторила
-    if prompt in decoded:
-        decoded = decoded.split(prompt, 1)[-1]
-
-    return decoded.strip()
+    return response.strip()
