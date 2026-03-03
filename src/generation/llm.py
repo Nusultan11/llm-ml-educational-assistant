@@ -1,7 +1,7 @@
 from typing import Tuple
 import logging
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 def setup_logger(name: str = "llm_project") -> logging.Logger:
@@ -22,31 +22,21 @@ def setup_logger(name: str = "llm_project") -> logging.Logger:
 logger = setup_logger(__name__)
 
 
-def load_mistral_4bit(
+def load_mistral(
     model_name: str = "mistralai/Mistral-7B-Instruct-v0.2",
 ) -> Tuple[AutoTokenizer, AutoModelForCausalLM]:
-
-    logger.info("Initializing 4-bit quantization config.")
-
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.bfloat16,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-    )
 
     logger.info("Loading tokenizer.")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    logger.info("Loading model in 4-bit mode.")
+    logger.info("Loading model in FP16 mode.")
 
-    # ❗ Убрали device_map
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        quantization_config=bnb_config,
+        torch_dtype=torch.float16,
+        device_map="auto",
         trust_remote_code=True,
     )
 
     logger.info("Model loaded successfully.")
-
     return tokenizer, model
