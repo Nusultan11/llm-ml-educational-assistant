@@ -32,9 +32,10 @@ def generate_response(
             pad_token_id=tokenizer.eos_token_id
         )
 
-    response = tokenizer.decode(
-        outputs[0][input_ids.shape[-1]:],
-        skip_special_tokens=True
-    )
+    decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    return response.strip()
+    # Удаляем prompt если модель его повторила
+    if prompt in decoded:
+        decoded = decoded.split(prompt, 1)[-1]
+
+    return decoded.strip()
