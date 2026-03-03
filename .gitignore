@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints
+
+# Data
+data/raw/
+data/processed/
+artifacts/
+results/
+
+# Models
+*.bin
+*.pt
+*.safetensors
+
+# Logs
+*.log
+
+# Env
+.env
+venv/
