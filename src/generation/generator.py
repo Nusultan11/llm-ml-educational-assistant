@@ -4,6 +4,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
+
 def generate_response(
     model,
     tokenizer,
@@ -16,7 +17,9 @@ def generate_response(
     messages = [
         {
             "role": "system",
-            "content": "You are a machine learning tutor. Explain clearly and directly. Do not repeat the question."
+            "content": "You are a machine learning tutor. "
+                       "Explain clearly, directly and simply. "
+                       "Do not restate the question."
         },
         {
             "role": "user",
