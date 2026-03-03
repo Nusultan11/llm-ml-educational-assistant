@@ -5,29 +5,21 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
 def generate_response(
-    model: AutoModelForCausalLM,
-    tokenizer: AutoTokenizer,
+    model,
+    tokenizer,
     prompt: str,
     max_new_tokens: int = 200,
     temperature: float = 0.7,
     top_p: float = 0.9,
 ) -> str:
-    """
-    Generate text response from model.
 
-    Args:
-        model: Loaded LLM model.
-        tokenizer: Corresponding tokenizer.
-        prompt: Input text prompt.
-        max_new_tokens: Maximum generated tokens.
-        temperature: Sampling temperature.
-        top_p: Nucleus sampling parameter.
+    # Apply Mistral chat template
+    formatted_prompt = f"<s>[INST] {prompt} [/INST]"
 
-    Returns:
-        Generated text string.
-    """
-
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    inputs = tokenizer(
+        formatted_prompt,
+        return_tensors="pt"
+    ).to(model.device)
 
     with torch.no_grad():
         outputs = model.generate(
@@ -36,6 +28,10 @@ def generate_response(
             temperature=temperature,
             top_p=top_p,
             do_sample=True,
+            pad_token_id=tokenizer.eos_token_id
         )
 
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+    decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    # Remove prompt from output
+    return decoded.replace(formatted_prompt, "").strip()
