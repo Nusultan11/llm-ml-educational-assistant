@@ -13,17 +13,18 @@ def generate_response(
     top_p: float = 0.9,
 ) -> str:
 
-    # Apply Mistral chat template
-    formatted_prompt = f"<s>[INST] {prompt} [/INST]"
+    messages = [
+        {"role": "user", "content": prompt}
+    ]
 
-    inputs = tokenizer(
-        formatted_prompt,
+    input_ids = tokenizer.apply_chat_template(
+        messages,
         return_tensors="pt"
     ).to(model.device)
 
     with torch.no_grad():
         outputs = model.generate(
-            **inputs,
+            input_ids,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
@@ -31,7 +32,9 @@ def generate_response(
             pad_token_id=tokenizer.eos_token_id
         )
 
-    decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    response = tokenizer.decode(
+        outputs[0][input_ids.shape[-1]:],
+        skip_special_tokens=True
+    )
 
-    # Remove prompt from output
-    return decoded.replace(formatted_prompt, "").strip()
+    return response.strip()
