@@ -27,3 +27,17 @@ artifacts/
 
 # HuggingFace cache
 .cache/
+
+# ML artifacts
+artifacts/
+*.faiss
+*.bin
+*.pt
+*.ckpt
+
+# datasets
+data/
+datasets/
+
+# colab
+.ipynb_checkpoints/
