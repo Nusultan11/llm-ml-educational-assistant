@@ -1,0 +1,4 @@
+Good prompts are explicit about constraints and scope.
+A robust RAG prompt tells the model to use only provided context.
+When context is insufficient, the model should say it does not know.
+Prompt templates reduce variance across runs.

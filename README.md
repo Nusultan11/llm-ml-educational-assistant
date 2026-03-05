@@ -18,8 +18,8 @@ Minimal RAG assistant skeleton with local retrieval and LLM generation.
 - `src/llm_ml_assistant/models` - embeddings and generator wrappers
 - `src/llm_ml_assistant/utils` - config loading utilities
 - `src/llm_ml_assistant/cli.py` - CLI commands (`index`, `ask`)
-- `configs/base.yaml` - runtime config
-- `data/examples` - tiny demo knowledge base
+- `configs/` - runtime profiles (`base`, `dev_cpu`, `colab_t4`)
+- `data/examples` - tiny demo knowledge base and eval set
 - `artifacts/` - generated index files (git-ignored)
 - `logs/` - runtime logs (git-ignored)
 - `tests/` - automated tests
@@ -32,6 +32,17 @@ python -m venv .venv
 pip install -r requirements.txt
 pip install -e .
 ```
+
+## Config profiles (with rationale)
+
+- `configs/dev_cpu.yaml`
+  - For local laptops and stable runs without GPU pressure.
+  - Smaller chunks and moderate `top_k`.
+- `configs/colab_t4.yaml`
+  - For Google Colab T4 sessions.
+  - Larger chunks and higher `top_k` for better recall.
+- `configs/base.yaml`
+  - Balanced default profile.
 
 ## Build persistent index
 
@@ -51,6 +62,20 @@ llm-ml-assistant ask "What is RAG?" --config configs/base.yaml --artifacts-dir a
 ```
 
 Note: first run may download models from Hugging Face, so internet access is required.
+
+## Mini retrieval evaluation (to justify config choices)
+
+```bash
+python scripts/evaluate_retrieval.py --config configs/dev_cpu.yaml --data-dir data/examples --eval data/examples/eval_qa.json
+python scripts/evaluate_retrieval.py --config configs/base.yaml --data-dir data/examples --eval data/examples/eval_qa.json
+python scripts/evaluate_retrieval.py --config configs/colab_t4.yaml --data-dir data/examples --eval data/examples/eval_qa.json
+```
+
+Compare:
+- `HitRate@k`
+- `MRR@k`
+
+Pick the profile that gives the best quality/speed trade-off for your environment.
 
 ## Alternative demo entrypoint
 

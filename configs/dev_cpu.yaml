@@ -4,17 +4,16 @@ project:
 
 model:
   name: "mistralai/Mistral-7B-Instruct-v0.2"
-  device: "cuda"
-  max_tokens: 512
+  device: "cpu"
+  max_tokens: 256
 
 embeddings:
   name: "sentence-transformers/all-MiniLM-L6-v2"
 
 rag:
-  # Balanced default profile:
-  # medium chunks, moderate overlap, moderate recall pressure.
-  chunk_size: 500
-  chunk_overlap: 80
+  # Safer for local laptops: smaller chunks and lower memory pressure.
+  chunk_size: 320
+  chunk_overlap: 64
   top_k: 4
 
 paths:

@@ -1,0 +1,4 @@
+Vector search compares embeddings in a geometric space.
+Cosine similarity is often approximated by inner product on normalized vectors.
+Top-k retrieval selects the k nearest chunks.
+If vectors are noisy, nearest neighbors can still be wrong.

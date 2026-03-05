@@ -1,0 +1,4 @@
+FAISS is a library for efficient similarity search.
+IndexFlatIP performs exact search with inner product.
+Exact search is simple but may be slower on very large corpora.
+Approximate indexes trade a bit of accuracy for speed.

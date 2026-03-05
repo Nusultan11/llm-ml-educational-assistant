@@ -5,17 +5,17 @@ project:
 model:
   name: "mistralai/Mistral-7B-Instruct-v0.2"
   device: "cuda"
-  max_tokens: 512
+  max_tokens: 384
 
 embeddings:
   name: "sentence-transformers/all-MiniLM-L6-v2"
 
 rag:
-  # Balanced default profile:
-  # medium chunks, moderate overlap, moderate recall pressure.
-  chunk_size: 500
-  chunk_overlap: 80
-  top_k: 4
+  # Tuned for Colab T4-like sessions:
+  # slightly bigger chunks and higher recall while keeping prompt bounded.
+  chunk_size: 600
+  chunk_overlap: 100
+  top_k: 5
 
 paths:
   data_dir: "data/examples"

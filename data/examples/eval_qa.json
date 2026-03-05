@@ -1,0 +1,78 @@
+[
+  {"query":"What does RAG stand for?","expected_substring":"Retrieval-Augmented Generation"},
+  {"query":"Expand the abbreviation RAG.","expected_substring":"Retrieval-Augmented Generation"},
+  {"query":"What is the first step in RAG according to intro?","expected_substring":"first retrieves relevant pieces of context"},
+  {"query":"After retrieval, who writes the response in RAG?","expected_substring":"language model produces an answer"},
+  {"query":"Why can RAG improve answer trustworthiness?","expected_substring":"grounded in those retrieved contexts"},
+  {"query":"What quality issues does RAG reduce?","expected_substring":"reduces hallucinations and improves factuality"},
+
+  {"query":"Does RAG guarantee truth?","expected_substring":"RAG does not guarantee truth"},
+  {"query":"What happens if retrieval misses key evidence?","expected_substring":"generation quality drops"},
+  {"query":"Name one common RAG failure mode from limits file.","expected_substring":"outdated context in the index"},
+  {"query":"When is RAG strongest?","expected_substring":"source documents are relevant and up to date"},
+
+  {"query":"How does vector search compare items?","expected_substring":"compares embeddings in a geometric space"},
+  {"query":"How is cosine similarity often approximated here?","expected_substring":"inner product on normalized vectors"},
+  {"query":"What does top-k retrieval choose?","expected_substring":"selects the k nearest chunks"},
+  {"query":"Can nearest neighbors be wrong?","expected_substring":"nearest neighbors can still be wrong"},
+
+  {"query":"What mechanism powers transformers?","expected_substring":"Self-attention lets each token attend to every other token"},
+  {"query":"How do RNNs process tokens compared with transformers?","expected_substring":"RNNs process tokens sequentially"},
+  {"query":"Why are transformers often faster to train than RNNs?","expected_substring":"process in parallel"},
+  {"query":"What did transformers replace in many NLP workloads?","expected_substring":"replaced many recurrent models in NLP"},
+
+  {"query":"What makes a prompt good in this project docs?","expected_substring":"explicit about constraints and scope"},
+  {"query":"What should a robust RAG prompt instruct?","expected_substring":"use only provided context"},
+  {"query":"What should model say when context is missing?","expected_substring":"say it does not know"},
+  {"query":"Why use prompt templates?","expected_substring":"reduce variance across runs"},
+
+  {"query":"What does HitRate@k measure?","expected_substring":"at least one relevant chunk appears in top-k"},
+  {"query":"What metric rewards early relevant ranking?","expected_substring":"MRR rewards ranking relevant chunks earlier"},
+  {"query":"How to interpret higher MRR?","expected_substring":"appears closer to rank one"},
+  {"query":"What should be compared along with quality metrics?","expected_substring":"compare both quality metrics and latency"},
+
+  {"query":"What is risky about Colab sessions?","expected_substring":"sessions are temporary and can reset unexpectedly"},
+  {"query":"Where should artifacts be stored in Colab?","expected_substring":"save important artifacts to persistent storage"},
+  {"query":"Is GPU availability fixed in Colab?","expected_substring":"GPU availability in Colab can change"},
+  {"query":"What should match available memory in Colab?","expected_substring":"Batch size and model size should match available memory"},
+
+  {"query":"What is FAISS used for?","expected_substring":"efficient similarity search"},
+  {"query":"What does IndexFlatIP do?","expected_substring":"exact search with inner product"},
+  {"query":"What is downside of exact search on huge corpora?","expected_substring":"may be slower on very large corpora"},
+  {"query":"Why use approximate indexes?","expected_substring":"trade a bit of accuracy for speed"},
+
+  {"query":"What is hallucination in LLM context?","expected_substring":"states unsupported claims"},
+  {"query":"What defines a grounded answer?","expected_substring":"cite or reflect retrieved evidence"},
+  {"query":"When does hallucination risk increase?","expected_substring":"retrieval returns irrelevant chunks"},
+  {"query":"How can chunking affect hallucination risk?","expected_substring":"Better chunking can reduce this risk"},
+
+  {"query":"List high-level stages of a typical RAG pipeline.","expected_substring":"four stages: ingest, index, retrieve, generate"},
+  {"query":"What does ingest stage do?","expected_substring":"Ingest loads raw documents"},
+  {"query":"What does index stage do?","expected_substring":"converts chunks into embeddings and stores them"},
+  {"query":"What does retrieve stage do?","expected_substring":"finds relevant chunks for a query"},
+
+  {"query":"How does data quality influence retrieval?","expected_substring":"Data quality strongly affects retrieval quality"},
+  {"query":"What problem can duplicate docs cause?","expected_substring":"bias nearest-neighbor results"},
+  {"query":"How can terminology mismatch hurt retrieval?","expected_substring":"Inconsistent terminology can reduce recall"},
+  {"query":"What often helps more than model tweaks?","expected_substring":"Cleaning and normalization often help more"},
+
+  {"query":"Which document says RAG does not guarantee truth?","expected_substring":"RAG does not guarantee truth"},
+  {"query":"Which topic mentions exact inner-product search?","expected_substring":"IndexFlatIP performs exact search with inner product"},
+  {"query":"Which note says prompts should limit scope?","expected_substring":"explicit about constraints and scope"},
+  {"query":"Which file notes that top-k picks nearest chunks?","expected_substring":"Top-k retrieval selects the k nearest chunks"},
+
+  {"query":"Is parallel processing discussed under transformers or FAISS?","expected_substring":"transformers process in parallel"},
+  {"query":"What should model do instead of guessing without evidence?","expected_substring":"say it does not know"},
+  {"query":"Why might retrieval fail despite vector search?","expected_substring":"If vectors are noisy, nearest neighbors can still be wrong"},
+  {"query":"What matters besides metric score during config choice?","expected_substring":"quality metrics and latency"},
+
+  {"query":"If index has stale facts, what risk appears?","expected_substring":"outdated context in the index"},
+  {"query":"What retrieval metric only checks whether relevant chunk appears at all?","expected_substring":"HitRate@k checks whether at least one relevant chunk appears in top-k"},
+  {"query":"What retrieval metric is sensitive to rank position?","expected_substring":"MRR rewards ranking relevant chunks earlier"},
+  {"query":"What practical Colab advice relates to memory limits?","expected_substring":"Batch size and model size should match available memory"},
+
+  {"query":"What can reduce recall even when model is strong?","expected_substring":"Inconsistent terminology can reduce recall"},
+  {"query":"What architectural idea combines transformers and retrieval?","expected_substring":"combine transformers with retrieval pipelines"},
+  {"query":"What is one direct benefit of grounding?","expected_substring":"improves factuality"},
+  {"query":"What should happen right before generation in pipeline?","expected_substring":"Retrieve finds relevant chunks for a query before generation"}
+]

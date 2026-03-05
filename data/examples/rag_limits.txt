@@ -1,0 +1,4 @@
+RAG is strongest when source documents are relevant and up to date.
+If retrieval misses key evidence, generation quality drops.
+RAG does not guarantee truth; it only improves grounding.
+A common failure mode is outdated context in the index.
