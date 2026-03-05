@@ -1,4 +1,4 @@
-# Python
+# Ignore Python build and cache
 __pycache__/
 *.pyc
 *.pyo
@@ -7,37 +7,32 @@ __pycache__/
 dist/
 build/
 
-# Environments
+# Virtual environments
 .env
-.venv
+.venv/
 env/
 ml/
-
-# Conda
-*.conda
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Logs
+# Runtime outputs
 logs/
-
-# Artifacts
 artifacts/
-
-# HuggingFace cache
 .cache/
 
-# ML artifacts
-artifacts/
+# Model binaries and checkpoints
 *.faiss
 *.bin
 *.pt
 *.ckpt
 
-# datasets
-data/
-datasets/
+# Data policy:
+# keep data private by default, but allow tracked examples
+/data/*
+!/data/examples/
+!/data/examples/**
+!/data/README.md
 
-# colab
-.ipynb_checkpoints/
+# Optional external datasets
+/datasets/

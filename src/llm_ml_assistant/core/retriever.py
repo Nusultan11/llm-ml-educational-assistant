@@ -7,12 +7,12 @@ from llm_ml_assistant.models.embeddings import EmbeddingModel
 
 
 class Retriever:
-    def __init__(self, config):
+    def __init__(self, config, embedding_model=None):
         self.chunk_size = config.rag.chunk_size
         self.chunk_overlap = config.rag.chunk_overlap
         self.top_k = config.rag.top_k
 
-        self.embedding_model = EmbeddingModel(config.embeddings.name)
+        self.embedding_model = embedding_model or EmbeddingModel(config.embeddings.name)
         self.text_chunks = []
         self.vector_store = None
 

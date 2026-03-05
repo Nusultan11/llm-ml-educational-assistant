@@ -2,23 +2,27 @@
 
 Minimal RAG assistant skeleton with local retrieval and LLM generation.
 
-## What is implemented
+## Features
 
-- YAML + Pydantic config loading
+- Config loading via YAML + Pydantic
 - Document chunking and vector indexing (FAISS)
 - Retrieval + prompt building
-- Generator wrapper based on Hugging Face Transformers
+- Generator wrapper for Hugging Face Transformers
 - CLI commands for indexing and question answering
+- Persistent index save/load (`.faiss` + chunks JSON)
+- Unit and integration tests
 
-## Project layout
+## Repository structure
 
-- `src/llm_ml_assistant/core` - retrieval, vector store, prompt, RAG pipeline
-- `src/llm_ml_assistant/models` - embedding and generator models
-- `src/llm_ml_assistant/utils` - config loading
+- `src/llm_ml_assistant/core` - retrieval, vector store, prompt builder, RAG pipeline
+- `src/llm_ml_assistant/models` - embeddings and generator wrappers
+- `src/llm_ml_assistant/utils` - config loading utilities
 - `src/llm_ml_assistant/cli.py` - CLI commands (`index`, `ask`)
-- `configs/base.yaml` - base runtime config
-- `scripts/smoke_test.py` - offline smoke test (no model downloads)
-- `tests/` - unit tests for core logic
+- `configs/base.yaml` - runtime config
+- `data/examples` - tiny demo knowledge base
+- `artifacts/` - generated index files (git-ignored)
+- `logs/` - runtime logs (git-ignored)
+- `tests/` - automated tests
 
 ## Setup
 
@@ -32,12 +36,13 @@ pip install -e .
 ## Build persistent index
 
 ```bash
-llm-ml-assistant index --config configs/base.yaml --data-dir data --artifacts-dir artifacts --rebuild
+llm-ml-assistant index --config configs/base.yaml --data-dir data/examples --artifacts-dir artifacts --rebuild
 ```
 
-Notes:
-- Reads `.txt` and `.md` files recursively from `data`.
+What it does:
+- Reads `.txt` and `.md` recursively from the data directory.
 - Saves `artifacts/rag_index.faiss` and `artifacts/rag_chunks.json`.
+- Writes CLI logs to `logs/cli.log`.
 
 ## Ask a question
 
@@ -45,24 +50,25 @@ Notes:
 llm-ml-assistant ask "What is RAG?" --config configs/base.yaml --artifacts-dir artifacts
 ```
 
-Note: the first run may download models from Hugging Face, so internet access is required.
+Note: first run may download models from Hugging Face, so internet access is required.
 
-## Run legacy main demo
+## Alternative demo entrypoint
 
 ```bash
 python -m llm_ml_assistant.main
 ```
 
-## Run offline smoke test
-
-```bash
-python scripts/smoke_test.py
-```
-
-This test validates the pipeline flow (`index -> retrieve -> prompt -> answer`) using mock retriever and generator.
-
-## Run unit tests
+## Tests
 
 ```bash
 python -m unittest discover -s tests -v
+python scripts/smoke_test.py
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+MIT, see [LICENSE](LICENSE).
