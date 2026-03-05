@@ -5,6 +5,9 @@ description = "LLM + ML assistant project"
 authors = [{name = "Nursultan"}]
 requires-python = ">=3.10"
 
+[project.scripts]
+llm-ml-assistant = "llm_ml_assistant.cli:app"
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"

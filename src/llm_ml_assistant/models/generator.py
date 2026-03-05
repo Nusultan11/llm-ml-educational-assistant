@@ -1,21 +1,22 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
 
 class Generator:
     def __init__(self, model_name: str, device: str = "cuda"):
-        self.device = device
+        self.device = self._resolve_device(device)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
+        torch_dtype = torch.float16 if self.device.startswith("cuda") else torch.float32
+
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float16,
-            device_map="auto",
-        )
+            torch_dtype=torch_dtype,
+        ).to(self.device)
 
     def generate(self, prompt: str, max_tokens: int = 512):
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
 
         with torch.no_grad():
             outputs = self.model.generate(
@@ -26,3 +27,8 @@ class Generator:
             )
 
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    def _resolve_device(self, requested_device: str) -> str:
+        if requested_device.startswith("cuda") and torch.cuda.is_available():
+            return requested_device
+        return "cpu"

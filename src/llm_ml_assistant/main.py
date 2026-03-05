@@ -1,9 +1,10 @@
 from pathlib import Path
 
-from llm_ml_assistant.utils.config import load_config
-from llm_ml_assistant.core.retriever import Retriever
 from llm_ml_assistant.core.prompt_builder import PromptBuilder
 from llm_ml_assistant.core.rag_pipeline import RAGPipeline
+from llm_ml_assistant.core.retriever import Retriever
+from llm_ml_assistant.models.generator import Generator
+from llm_ml_assistant.utils.config import load_config
 
 
 def main():
@@ -12,6 +13,7 @@ def main():
     print("=== CONFIG LOADED ===")
     print("Project:", config.project.name)
     print("Embedding model:", config.embeddings.name)
+    print("Generator model:", config.model.name)
     print("Top-K:", config.rag.top_k)
     print()
 
@@ -36,25 +38,25 @@ def main():
 
     retriever = Retriever(config)
     prompt_builder = PromptBuilder()
-    rag = RAGPipeline(retriever=retriever, prompt_builder=prompt_builder)
+    generator = Generator(
+        model_name=config.model.name,
+        device=config.model.device,
+    )
+    rag = RAGPipeline(
+        retriever=retriever,
+        prompt_builder=prompt_builder,
+        generator=generator,
+    )
 
     print("Indexing documents...")
     rag.index(docs)
     print("Index built successfully.\n")
 
     query = "Explain what RAG is."
-    out = rag.build(query)
+    answer = rag.ask(query)
 
-    print("=== TOP-K CONTEXT ===")
-    for i, c in enumerate(out["contexts"], 1):
-        print(f"\n[{i}]\n{c.strip()}")
-
-    print("\n=== BUILT PROMPT (preview) ===")
-    # Чтобы не засорять консоль, показываем первые ~800 символов
-    preview = out["prompt"][:800]
-    print(preview)
-    if len(out["prompt"]) > 800:
-        print("\n... (truncated)")
+    print("=== ANSWER ===")
+    print(answer)
 
 
 if __name__ == "__main__":

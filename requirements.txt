@@ -3,5 +3,7 @@ pydantic
 typer
 rich
 sentence-transformers
+transformers
+torch
 faiss-cpu
 numpy

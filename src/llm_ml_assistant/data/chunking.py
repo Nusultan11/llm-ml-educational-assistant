@@ -6,6 +6,13 @@ def chunk_text(
     chunk_size: int,
     chunk_overlap: int,
 ) -> List[str]:
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be > 0")
+    if chunk_overlap < 0:
+        raise ValueError("chunk_overlap must be >= 0")
+    if chunk_overlap >= chunk_size:
+        raise ValueError("chunk_overlap must be < chunk_size")
+
     chunks = []
     start = 0
     text_length = len(text)
