@@ -4,7 +4,6 @@ from pathlib import Path
 import typer
 
 from llm_ml_assistant.core.prompt_builder import PromptBuilder
-from llm_ml_assistant.core.rag_pipeline import RAGPipeline
 from llm_ml_assistant.core.retriever import Retriever
 from llm_ml_assistant.models.generator import Generator
 from llm_ml_assistant.utils.config import load_config
@@ -54,6 +53,12 @@ def _build_logger(logs_dir: Path) -> tuple[logging.Logger, Path]:
     return logger, log_path
 
 
+def _print_contexts(contexts: list[str]):
+    typer.echo("\n=== Retrieved Contexts ===")
+    for i, ctx in enumerate(contexts, start=1):
+        typer.echo(f"\n[{i}]\n{ctx.strip()}")
+
+
 @app.command()
 def index(
     config_path: Path = typer.Option(Path("configs/base.yaml"), "--config"),
@@ -100,32 +105,57 @@ def ask(
     query: str = typer.Argument(..., help="User question"),
     config_path: Path = typer.Option(Path("configs/base.yaml"), "--config"),
     artifacts_dir: Path | None = typer.Option(None, "--artifacts-dir"),
+    mode: str = typer.Option("rag", "--mode", help="rag or retrieval_only"),
+    show_contexts: bool = typer.Option(False, "--show-contexts"),
 ):
     """Load persisted index and answer a question."""
     config = load_config(config_path)
     logger, log_path = _build_logger(Path(config.paths.logs_dir))
 
     try:
+        if mode not in {"rag", "retrieval_only"}:
+            raise ValueError("mode must be 'rag' or 'retrieval_only'")
+
         resolved_artifacts_dir = artifacts_dir or Path(config.paths.artifacts_dir)
         index_path, chunks_path = _index_paths(resolved_artifacts_dir)
 
         retriever = Retriever(config)
         retriever.load(index_path=index_path, chunks_path=chunks_path)
 
-        prompt_builder = PromptBuilder()
-        generator = Generator(
-            model_name=config.model.name,
-            device=config.model.device,
-        )
-        rag = RAGPipeline(
-            retriever=retriever,
-            prompt_builder=prompt_builder,
-            generator=generator,
-        )
+        contexts = retriever.retrieve(query)
 
-        answer = rag.ask(query)
-        logger.info("Answered query: %s", query)
-        typer.echo(answer)
+        if show_contexts:
+            _print_contexts(contexts)
+
+        if mode == "retrieval_only":
+            logger.info("Answered query in retrieval_only mode: %s", query)
+            if not contexts:
+                typer.echo("No relevant contexts found.")
+                return
+            typer.echo("\n=== Retrieval-Only Answer ===")
+            typer.echo("Use the contexts above as evidence for your response.")
+            return
+
+        prompt_builder = PromptBuilder()
+        prompt = prompt_builder.build(query, contexts)
+
+        try:
+            generator = Generator(
+                model_name=config.model.name,
+                device=config.model.device,
+            )
+            answer = generator.generate(prompt, max_tokens=config.model.max_tokens)
+            logger.info("Answered query in rag mode: %s", query)
+            typer.echo(answer)
+        except Exception as llm_exc:
+            logger.exception("LLM generation failed; fallback to retrieval_only")
+            typer.echo(
+                f"RAG generation failed ({llm_exc}). Falling back to retrieval_only.",
+                err=True,
+            )
+            if not show_contexts:
+                _print_contexts(contexts)
+
     except Exception as exc:
         logger.exception("Ask command failed")
         typer.echo(f"Ask failed: {exc}", err=True)

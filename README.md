@@ -19,7 +19,7 @@ Minimal RAG assistant skeleton with local retrieval and LLM generation.
 - `src/llm_ml_assistant/utils` - config loading utilities
 - `src/llm_ml_assistant/cli.py` - CLI commands (`index`, `ask`)
 - `configs/` - runtime profiles (`base`, `dev_cpu`, `colab_t4`)
-- `data/examples` - tiny demo knowledge base and eval set
+- `data/examples` - demo knowledge base and eval set
 - `artifacts/` - generated index files (git-ignored)
 - `logs/` - runtime logs (git-ignored)
 - `tests/` - automated tests
@@ -37,10 +37,8 @@ pip install -e .
 
 - `configs/dev_cpu.yaml`
   - For local laptops and stable runs without GPU pressure.
-  - Smaller chunks and moderate `top_k`.
 - `configs/colab_t4.yaml`
   - For Google Colab T4 sessions.
-  - Larger chunks and higher `top_k` for better recall.
 - `configs/base.yaml`
   - Balanced default profile.
 
@@ -57,11 +55,21 @@ What it does:
 
 ## Ask a question
 
+RAG mode (default):
+
 ```bash
-llm-ml-assistant ask "What is RAG?" --config configs/base.yaml --artifacts-dir artifacts
+llm-ml-assistant ask "What is RAG?" --config configs/colab_t4.yaml --artifacts-dir artifacts --mode rag --show-contexts
 ```
 
-Note: first run may download models from Hugging Face, so internet access is required.
+Retrieval-only mode (no LLM, fully free/fallback):
+
+```bash
+llm-ml-assistant ask "What is RAG?" --config configs/colab_t4.yaml --artifacts-dir artifacts --mode retrieval_only --show-contexts
+```
+
+Notes:
+- If `--mode rag` fails (OOM/GPU/network), CLI falls back to retrieval-only and prints contexts.
+- `--show-contexts` is useful for debugging and source transparency.
 
 ## Mini retrieval evaluation (to justify config choices)
 
@@ -74,8 +82,6 @@ python scripts/evaluate_retrieval.py --config configs/colab_t4.yaml --data-dir d
 Compare:
 - `HitRate@k`
 - `MRR@k`
-
-Pick the profile that gives the best quality/speed trade-off for your environment.
 
 ## Alternative demo entrypoint
 
