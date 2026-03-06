@@ -18,6 +18,8 @@ class RAGConfig(BaseModel):
     chunk_size: int
     chunk_overlap: int
     top_k: int
+    retrieval_mode: str = "vector"
+    rrf_k: int = 60
 
 
 class EmbeddingConfig(BaseModel):
@@ -38,7 +40,7 @@ class Config(BaseModel):
     paths: PathsConfig
 
 
-def load_config(path: str) -> Config:
-    with open(path, "r") as f:
+def load_config(path: str | Path) -> Config:
+    with open(path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return Config(**data)

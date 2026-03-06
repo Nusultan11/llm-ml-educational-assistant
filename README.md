@@ -6,6 +6,7 @@ Minimal RAG assistant skeleton with local retrieval and LLM generation.
 
 - Config loading via YAML + Pydantic
 - Document chunking and vector indexing (FAISS)
+- Hybrid retrieval (`vector + keyword`) with RRF fusion
 - Retrieval + prompt building
 - Generator wrapper for Hugging Face Transformers
 - CLI commands for indexing and question answering
@@ -14,7 +15,7 @@ Minimal RAG assistant skeleton with local retrieval and LLM generation.
 
 ## Repository structure
 
-- `src/llm_ml_assistant/core` - retrieval, vector store, prompt builder, RAG pipeline
+- `src/llm_ml_assistant/core` - retrieval, vector store, keyword index, prompt builder
 - `src/llm_ml_assistant/models` - embeddings and generator wrappers
 - `src/llm_ml_assistant/utils` - config loading utilities
 - `src/llm_ml_assistant/cli.py` - CLI commands (`index`, `ask`)
@@ -36,11 +37,22 @@ pip install -e .
 ## Config profiles (with rationale)
 
 - `configs/dev_cpu.yaml`
-  - For local laptops and stable runs without GPU pressure.
+  - Stable local runs on CPU.
+  - Embedding model: `intfloat/e5-base`
+  - Retrieval mode: `hybrid`
 - `configs/colab_t4.yaml`
-  - For Google Colab T4 sessions.
+  - Colab T4-oriented profile.
+  - Embedding model: `BAAI/bge-base-en`
+  - Retrieval mode: `hybrid`
 - `configs/base.yaml`
   - Balanced default profile.
+
+## Retrieval settings
+
+In `rag` config section:
+
+- `retrieval_mode`: `vector` or `hybrid`
+- `rrf_k`: Reciprocal Rank Fusion smoothing constant (used in `hybrid`)
 
 ## Build persistent index
 
@@ -71,7 +83,7 @@ Notes:
 - If `--mode rag` fails (OOM/GPU/network), CLI falls back to retrieval-only and prints contexts.
 - `--show-contexts` is useful for debugging and source transparency.
 
-## Mini retrieval evaluation (to justify config choices)
+## Mini retrieval evaluation
 
 ```bash
 python scripts/evaluate_retrieval.py --config configs/dev_cpu.yaml --data-dir data/examples --eval data/examples/eval_qa.json

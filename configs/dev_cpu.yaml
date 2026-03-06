@@ -8,13 +8,14 @@ model:
   max_tokens: 256
 
 embeddings:
-  name: "sentence-transformers/all-MiniLM-L6-v2"
+  name: "intfloat/e5-base"
 
 rag:
-  # Safer for local laptops: smaller chunks and lower memory pressure.
   chunk_size: 320
   chunk_overlap: 64
   top_k: 4
+  retrieval_mode: "hybrid"
+  rrf_k: 60
 
 paths:
   data_dir: "data/examples"

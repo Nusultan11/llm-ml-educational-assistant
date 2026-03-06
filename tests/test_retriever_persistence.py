@@ -9,7 +9,13 @@ from llm_ml_assistant.core.retriever import Retriever
 
 
 class FakeEmbeddingModel:
-    def encode(self, texts: list[str]) -> np.ndarray:
+    def encode_documents(self, texts: list[str]) -> np.ndarray:
+        return self._encode(texts)
+
+    def encode_queries(self, texts: list[str]) -> np.ndarray:
+        return self._encode(texts)
+
+    def _encode(self, texts: list[str]) -> np.ndarray:
         vectors = []
         for text in texts:
             lower = text.lower()
@@ -23,10 +29,24 @@ class FakeEmbeddingModel:
         return np.asarray(vectors, dtype=np.float32)
 
 
+class ConstantEmbeddingModel:
+    def encode_documents(self, texts: list[str]) -> np.ndarray:
+        return np.asarray([[1.0, 1.0, 1.0] for _ in texts], dtype=np.float32)
+
+    def encode_queries(self, texts: list[str]) -> np.ndarray:
+        return np.asarray([[1.0, 1.0, 1.0] for _ in texts], dtype=np.float32)
+
+
 class RetrieverPersistenceTests(unittest.TestCase):
     def test_save_load_and_retrieve(self):
         config = SimpleNamespace(
-            rag=SimpleNamespace(chunk_size=500, chunk_overlap=0, top_k=2),
+            rag=SimpleNamespace(
+                chunk_size=500,
+                chunk_overlap=0,
+                top_k=2,
+                retrieval_mode="vector",
+                rrf_k=60,
+            ),
             embeddings=SimpleNamespace(name="fake"),
         )
 
@@ -54,6 +74,32 @@ class RetrieverPersistenceTests(unittest.TestCase):
             self.assertTrue(chunks_path.exists())
             self.assertGreaterEqual(len(results), 1)
             self.assertIn("RAG", results[0])
+
+    def test_hybrid_mode_uses_keyword_signal(self):
+        config = SimpleNamespace(
+            rag=SimpleNamespace(
+                chunk_size=500,
+                chunk_overlap=0,
+                top_k=1,
+                retrieval_mode="hybrid",
+                rrf_k=60,
+            ),
+            embeddings=SimpleNamespace(name="fake"),
+        )
+
+        docs = [
+            "This paragraph is generic and does not mention the target.",
+            "Another generic paragraph without special term.",
+            "Hybrid retrieval should find foobar_token evidence quickly.",
+        ]
+
+        retriever = Retriever(config, embedding_model=ConstantEmbeddingModel())
+        retriever.index_documents(docs)
+
+        results = retriever.retrieve("Where is foobar_token mentioned?")
+
+        self.assertEqual(len(results), 1)
+        self.assertIn("foobar_token", results[0])
 
 
 if __name__ == "__main__":

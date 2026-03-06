@@ -8,14 +8,14 @@ model:
   max_tokens: 512
 
 embeddings:
-  name: "sentence-transformers/all-MiniLM-L6-v2"
+  name: "intfloat/e5-base"
 
 rag:
-  # Balanced default profile:
-  # medium chunks, moderate overlap, moderate recall pressure.
   chunk_size: 500
   chunk_overlap: 80
   top_k: 4
+  retrieval_mode: "hybrid"
+  rrf_k: 60
 
 paths:
   data_dir: "data/examples"
