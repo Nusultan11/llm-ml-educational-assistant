@@ -1,0 +1,31 @@
+{
+  "eda_status": "PASS_WITH_CLEANING_REQUIRED",
+  "quality": {
+    "rag_rows": 9235,
+    "sft_rows": 5095,
+    "rag_non_ascii_gt_30pct": 310,
+    "sft_non_ascii_gt_30pct": 199,
+    "rag_noise_rows": 756,
+    "sft_noise_rows": 372,
+    "rag_source_counts": {
+      "openassistant": 7690,
+      "dolly": 1545
+    },
+    "sft_source_counts": {
+      "openassistant": 3149,
+      "dolly": 1946
+    }
+  },
+  "near_dup": {
+    "pairs_checked": 119180,
+    "near_dup_pairs": 0,
+    "near_dup_rate_est": 0.0
+  },
+  "gates": {
+    "noise_ok": false,
+    "language_ok": true,
+    "near_dup_ok": true,
+    "source_balance_present": true
+  },
+  "next_step": "build processed_v2_clean with filtering + dedup + reindex"
+}

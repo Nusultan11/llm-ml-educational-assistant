@@ -1,0 +1,16 @@
+{
+  "rag_rows": 9235,
+  "sft_rows": 5095,
+  "rag_non_ascii_gt_30pct": 310,
+  "sft_non_ascii_gt_30pct": 199,
+  "rag_noise_rows": 756,
+  "sft_noise_rows": 372,
+  "rag_source_counts": {
+    "openassistant": 7690,
+    "dolly": 1545
+  },
+  "sft_source_counts": {
+    "openassistant": 3149,
+    "dolly": 1946
+  }
+}
