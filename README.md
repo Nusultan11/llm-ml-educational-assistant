@@ -19,8 +19,9 @@ Minimal RAG assistant skeleton with local retrieval and LLM generation.
 - `src/llm_ml_assistant/models` - embeddings and generator wrappers
 - `src/llm_ml_assistant/utils` - config loading utilities
 - `src/llm_ml_assistant/cli.py` - CLI commands (`index`, `ask`)
-- `configs/` - runtime profiles (`base`, `dev_cpu`, `colab_t4`)
+- `configs/` - runtime profiles (`base`, `dev_cpu`, `colab_t4`, `colab_light`)
 - `data/examples` - demo knowledge base and eval set
+- `data/processed` - prepared RAG/SFT datasets
 - `artifacts/` - generated index files (git-ignored)
 - `logs/` - runtime logs (git-ignored)
 - `tests/` - automated tests
@@ -34,6 +35,21 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
+## Prepare datasets (RAG + SFT)
+
+```bash
+python scripts/prepare_datasets.py --out-dir data/processed
+```
+
+Outputs:
+- `data/processed/rag_corpus.jsonl`
+- `data/processed/sft_instructions.jsonl`
+- `data/processed/summary.json`
+
+Optional local sources (JSONL):
+- `data/raw/stackoverflow.jsonl` with fields: `id,title,question,answer`
+- `data/raw/arxiv.jsonl` with fields: `id,title,abstract`
+
 ## Config profiles (with rationale)
 
 - `configs/dev_cpu.yaml`
@@ -41,9 +57,12 @@ pip install -e .
   - Embedding model: `intfloat/e5-base`
   - Retrieval mode: `hybrid`
 - `configs/colab_t4.yaml`
-  - Colab T4-oriented profile.
+  - Colab T4-oriented profile with `Mistral-7B`.
   - Embedding model: `BAAI/bge-base-en`
   - Retrieval mode: `hybrid`
+- `configs/colab_light.yaml`
+  - Colab free-friendly profile with lighter generator (`Phi-3-mini`).
+  - Good default when `Mistral-7B` is too heavy.
 - `configs/base.yaml`
   - Balanced default profile.
 
@@ -65,6 +84,21 @@ What it does:
 - Saves `artifacts/rag_index.faiss` and `artifacts/rag_chunks.json`.
 - Writes CLI logs to `logs/cli.log`.
 
+## Artifact snapshots (recommended)
+
+To preserve step-by-step index history with metadata:
+
+```bash
+python scripts/archive_artifacts.py --artifacts-dir artifacts --config configs/colab_t4.yaml --data-dir data/examples --label step_01 --notes "baseline after hybrid indexing"
+```
+
+This creates:
+- `artifacts/snapshots/<timestamp>__<label>/rag_index.faiss`
+- `artifacts/snapshots/<timestamp>__<label>/rag_chunks.json`
+- `artifacts/snapshots/<timestamp>__<label>/metadata.json`
+
+Metadata includes config values, chunk count, file hashes, and notes.
+
 ## Ask a question
 
 RAG mode (default):
@@ -77,6 +111,12 @@ Retrieval-only mode (no LLM, fully free/fallback):
 
 ```bash
 llm-ml-assistant ask "What is RAG?" --config configs/colab_t4.yaml --artifacts-dir artifacts --mode retrieval_only --show-contexts
+```
+
+For Colab free stability:
+
+```bash
+llm-ml-assistant ask "What is RAG?" --config configs/colab_light.yaml --artifacts-dir artifacts --mode rag --show-contexts
 ```
 
 Notes:

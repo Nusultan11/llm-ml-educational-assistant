@@ -8,11 +8,11 @@ class Generator:
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        torch_dtype = torch.float16 if self.device.startswith("cuda") else torch.float32
+        dtype = torch.float16 if self.device.startswith("cuda") else torch.float32
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch_dtype,
+            dtype=dtype,
         ).to(self.device)
 
     def generate(self, prompt: str, max_tokens: int = 512):
