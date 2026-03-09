@@ -9,11 +9,20 @@ class EmbeddingModel:
 
     def encode_documents(self, texts: list[str]) -> np.ndarray:
         prepared = self._prepare_documents(texts)
-        return self.model.encode(prepared, convert_to_numpy=True)
+        return self.model.encode(
+            prepared,
+            convert_to_numpy=True,
+            batch_size=64,
+            show_progress_bar=True,
+        )
 
     def encode_queries(self, texts: list[str]) -> np.ndarray:
         prepared = self._prepare_queries(texts)
-        return self.model.encode(prepared, convert_to_numpy=True)
+        return self.model.encode(
+            prepared,
+            convert_to_numpy=True,
+            show_progress_bar=False,
+        )
 
     def encode(self, texts: list[str]) -> np.ndarray:
         # Backward-compatible alias used in tests and old call sites.

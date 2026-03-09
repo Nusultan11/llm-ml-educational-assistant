@@ -1,4 +1,4 @@
-# llm-ml-assistant
+﻿# llm-ml-assistant
 
 Minimal RAG assistant skeleton with local retrieval and LLM generation.
 
@@ -49,6 +49,20 @@ Outputs:
 Optional local sources (JSONL):
 - `data/raw/stackoverflow.jsonl` with fields: `id,title,question,answer`
 - `data/raw/arxiv.jsonl` with fields: `id,title,abstract`
+
+## Clean datasets after EDA (local v2)
+
+Build cleaned outputs and local RAG docs:
+
+```bash
+python scripts/clean_processed_datasets.py --in-dir data/processed --out-dir data/processed_v2_clean --rag-docs-dir data/rag_docs_v2_clean
+```
+
+Outputs:
+- `data/processed_v2_clean/rag_corpus.jsonl`
+- `data/processed_v2_clean/sft_instructions.jsonl`
+- `data/processed_v2_clean/cleaning_summary.json`
+- `data/rag_docs_v2_clean/*.txt`
 
 ## Config profiles (with rationale)
 
@@ -155,3 +169,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
