@@ -64,6 +64,25 @@ Outputs:
 - `data/processed_v2_clean/cleaning_summary.json`
 - `data/rag_docs_v2_clean/*.txt`
 
+## Run full local pipeline (one command)
+
+```bash
+python scripts/run_local_pipeline.py --config configs/colab_light.yaml --snapshot-label v2_clean_local
+```
+
+On Windows, keep `--artifacts-dir` and `--data-dir` relative (for example `artifacts`, `data/rag_docs_v2_clean`) to avoid FAISS path issues with Unicode absolute paths.
+
+Default flow:
+- prepare datasets (`data/processed`)
+- clean datasets (`data/processed_v2_clean`)
+- rebuild index from `data/rag_docs_v2_clean`
+- archive artifacts snapshot
+
+Useful flags:
+- `--skip-prepare`, `--skip-clean`, `--skip-index`, `--skip-archive`
+- `--no-openassistant`, `--no-dolly`
+- cleaning thresholds: `--min-rag-chars`, `--min-instruction-chars`, `--min-response-chars`
+
 ## Config profiles (with rationale)
 
 - `configs/dev_cpu.yaml`
@@ -169,4 +188,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+
 
