@@ -36,3 +36,6 @@ artifacts/
 
 # Optional external datasets
 /datasets/
+
+# Ad-hoc retrieval comparison outputs
+/reports/retrieval_compare/

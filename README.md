@@ -168,6 +168,14 @@ Compare:
 - `HitRate@k`
 - `MRR@k`
 
+For artifact-based local baseline logging (real-data index):
+
+```bash
+python scripts/evaluate_artifacts_retrieval.py --config configs/colab_light.yaml --artifacts-dir artifacts --eval data/processed_v2_clean/eval_auto_qa.json --snapshot-label <snapshot_label> --tag <run_tag> --out reports/retrieval_metrics/<run_tag>.json --history-path reports/retrieval_metrics/history.jsonl
+```
+
+See logged metrics in `reports/retrieval_metrics/`.
+
 ## Alternative demo entrypoint
 
 ```bash
@@ -188,6 +196,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
 
 
 

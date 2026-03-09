@@ -1,0 +1,20 @@
+{
+  "created_at_utc": "2026-03-09T16:04:46Z",
+  "tag": "v2_clean_baseline",
+  "snapshot_label": "20260309T152715Z__v2_clean_local_retry",
+  "config": "configs\\colab_light.yaml",
+  "artifacts_dir": "artifacts",
+  "eval_file": "data\\processed_v2_clean\\eval_auto_qa.json",
+  "embedding_model": "BAAI/bge-base-en",
+  "retrieval_mode": "hybrid",
+  "top_k": 5,
+  "queries": 200,
+  "hits": 66,
+  "hit_rate": 0.33,
+  "mrr": 0.297583,
+  "offline_flags": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1",
+    "HF_DATASETS_OFFLINE": "1"
+  }
+}
