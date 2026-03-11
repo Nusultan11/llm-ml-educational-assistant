@@ -200,3 +200,31 @@ MIT, see [LICENSE](LICENSE).
 
 
 
+
+## Automated retrieval ablation (recommended)
+
+Run reproducible parameter search over retrieval profiles (`chunk_size`, `chunk_overlap`, `top_k`, `retrieval_mode`) and get a leaderboard.
+
+```bash
+python scripts/run_retrieval_ablation.py \
+  --base-config configs/colab_light.yaml \
+  --rag-docs-dir data/rag_docs_v2_clean_plus \
+  --processed-clean-dir data/processed_v2_clean_plus \
+  --eval data/processed_v2_clean/eval_auto_qa.json \
+  --chunk-sizes 420,520,700 \
+  --chunk-overlaps 40,80,120 \
+  --top-ks 3,5,8 \
+  --retrieval-modes hybrid \
+  --tag-prefix v2_ablation
+```
+
+Outputs are saved to:
+- `reports/retrieval_metrics/ablation/<run_id>/run_summary.json`
+- `reports/retrieval_metrics/ablation/<run_id>/leaderboard.csv`
+- `reports/retrieval_metrics/ablation/<run_id>/leaderboard.md`
+
+Tip for quick smoke run:
+
+```bash
+python scripts/run_retrieval_ablation.py --max-runs 2 --dry-run
+```

@@ -28,3 +28,10 @@ python scripts/evaluate_artifacts_retrieval.py \
   --out reports/retrieval_metrics/<run_tag>.json \
   --history-path reports/retrieval_metrics/history.jsonl
 ```
+## Ablation logs
+
+Automated ablation runs are stored under:
+
+- `reports/retrieval_metrics/ablation/<run_id>/run_summary.json`
+- `reports/retrieval_metrics/ablation/<run_id>/leaderboard.csv`
+- `reports/retrieval_metrics/ablation/<run_id>/leaderboard.md`
