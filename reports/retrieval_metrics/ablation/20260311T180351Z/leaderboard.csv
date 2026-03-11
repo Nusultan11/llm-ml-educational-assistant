@@ -1,0 +1,4 @@
+rank,tag,retrieval_mode,chunk_size,chunk_overlap,top_k,queries,hit_rate,mrr,snapshot,pipeline_profile_reused,pipeline_sec,eval_sec,total_sec
+1,colab_v2_chunk_hybrid_c420_o80_k5,hybrid,420,80,5,200,0.325,0.312917,20260311T180748Z__20260311T180351Z_01_colab_v2_chunk_hybrid_c420_o80_k5,False,237.776,19.927,257.703
+2,colab_v2_chunk_hybrid_c700_o80_k5,hybrid,700,80,5,200,0.33,0.306583,20260311T181609Z__20260311T180351Z_03_colab_v2_chunk_hybrid_c700_o80_k5,False,229.296,17.504,246.8
+3,colab_v2_chunk_hybrid_c520_o80_k5,hybrid,520,80,5,200,0.33,0.297583,20260311T181202Z__20260311T180351Z_02_colab_v2_chunk_hybrid_c520_o80_k5,False,233.969,17.465,251.434

@@ -1,0 +1,5 @@
+rank,tag,retrieval_mode,chunk_size,chunk_overlap,top_k,queries,hit_rate,mrr,snapshot,pipeline_profile_reused,pipeline_sec,eval_sec,total_sec
+1,colab_v2_overlap_hybrid_c700_o40_k5,hybrid,700,40,5,200,0.33,0.3095,20260311T182005Z__20260311T181627Z_01_colab_v2_overlap_hybrid_c700_o40_k5,False,218.476,17.628,236.104
+2,colab_v2_overlap_hybrid_c700_o120_k5,hybrid,700,120,5,200,0.33,0.308917,20260311T182826Z__20260311T181627Z_03_colab_v2_overlap_hybrid_c700_o120_k5,False,236.443,16.715,253.158
+3,colab_v2_overlap_hybrid_c700_o160_k5,hybrid,700,160,5,200,0.33,0.307833,20260311T183252Z__20260311T181627Z_04_colab_v2_overlap_hybrid_c700_o160_k5,False,249.343,18.606,267.949
+4,colab_v2_overlap_hybrid_c700_o80_k5,hybrid,700,80,5,200,0.33,0.306583,20260311T182412Z__20260311T181627Z_02_colab_v2_overlap_hybrid_c700_o80_k5,False,229.06,18.476,247.536

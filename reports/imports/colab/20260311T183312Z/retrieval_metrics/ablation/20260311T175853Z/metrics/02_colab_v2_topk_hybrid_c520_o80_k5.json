@@ -1,0 +1,20 @@
+{
+  "created_at_utc": "2026-03-11T18:03:32Z",
+  "tag": "colab_v2_topk_hybrid_c520_o80_k5",
+  "snapshot_label": "20260311T180255Z__20260311T175853Z_01_colab_v2_topk_hybrid_c520_o80_k3",
+  "config": "reports/retrieval_metrics/ablation/20260311T175853Z/configs/02_colab_v2_topk_hybrid_c520_o80_k5.yaml",
+  "artifacts_dir": "artifacts",
+  "eval_file": "data/processed_v2_clean_plus/eval_auto_qa.json",
+  "embedding_model": "BAAI/bge-base-en",
+  "retrieval_mode": "hybrid",
+  "top_k": 5,
+  "queries": 200,
+  "hits": 66,
+  "hit_rate": 0.33,
+  "mrr": 0.297583,
+  "offline_flags": {
+    "HF_HUB_OFFLINE": "",
+    "TRANSFORMERS_OFFLINE": "",
+    "HF_DATASETS_OFFLINE": ""
+  }
+}

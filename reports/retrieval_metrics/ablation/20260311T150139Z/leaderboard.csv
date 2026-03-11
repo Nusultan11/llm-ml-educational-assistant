@@ -1,0 +1,4 @@
+rank,tag,retrieval_mode,chunk_size,chunk_overlap,top_k,queries,hit_rate,mrr,snapshot,pipeline_profile_reused,pipeline_sec,eval_sec,total_sec
+1,v2_topk_hybrid_c520_o80_k5,hybrid,520,80,5,200,0.33,0.297583,20260311T160542Z__20260311T150139Z_01_v2_topk_hybrid_c520_o80_k3,True,0.0,45.17,45.17
+2,v2_topk_hybrid_c520_o80_k8,hybrid,520,80,8,200,0.33,0.297583,20260311T160542Z__20260311T150139Z_01_v2_topk_hybrid_c520_o80_k3,True,0.0,42.188,42.188
+3,v2_topk_hybrid_c520_o80_k3,hybrid,520,80,3,200,0.31,0.293333,20260311T160542Z__20260311T150139Z_01_v2_topk_hybrid_c520_o80_k3,False,3842.919,47.776,3890.695

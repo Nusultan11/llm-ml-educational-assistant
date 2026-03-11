@@ -1,0 +1,19 @@
+project:
+  name: llm-ml-assistant
+  version: '0.1'
+model:
+  name: microsoft/Phi-3-mini-4k-instruct
+  device: cuda
+  max_tokens: 256
+embeddings:
+  name: BAAI/bge-base-en
+rag:
+  chunk_size: 700
+  chunk_overlap: 80
+  top_k: 5
+  retrieval_mode: hybrid
+  rrf_k: 60
+paths:
+  data_dir: data/examples
+  artifacts_dir: artifacts
+  logs_dir: logs

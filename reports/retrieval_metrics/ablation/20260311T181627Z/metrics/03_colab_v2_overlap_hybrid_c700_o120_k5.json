@@ -1,0 +1,20 @@
+{
+  "created_at_utc": "2026-03-11T18:28:42Z",
+  "tag": "colab_v2_overlap_hybrid_c700_o120_k5",
+  "snapshot_label": "20260311T182826Z__20260311T181627Z_03_colab_v2_overlap_hybrid_c700_o120_k5",
+  "config": "reports/retrieval_metrics/ablation/20260311T181627Z/configs/03_colab_v2_overlap_hybrid_c700_o120_k5.yaml",
+  "artifacts_dir": "artifacts",
+  "eval_file": "data/processed_v2_clean_plus/eval_auto_qa.json",
+  "embedding_model": "BAAI/bge-base-en",
+  "retrieval_mode": "hybrid",
+  "top_k": 5,
+  "queries": 200,
+  "hits": 66,
+  "hit_rate": 0.33,
+  "mrr": 0.308917,
+  "offline_flags": {
+    "HF_HUB_OFFLINE": "",
+    "TRANSFORMERS_OFFLINE": "",
+    "HF_DATASETS_OFFLINE": ""
+  }
+}

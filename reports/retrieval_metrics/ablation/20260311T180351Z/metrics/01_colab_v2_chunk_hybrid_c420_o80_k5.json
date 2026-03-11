@@ -1,0 +1,20 @@
+{
+  "created_at_utc": "2026-03-11T18:08:07Z",
+  "tag": "colab_v2_chunk_hybrid_c420_o80_k5",
+  "snapshot_label": "20260311T180748Z__20260311T180351Z_01_colab_v2_chunk_hybrid_c420_o80_k5",
+  "config": "reports/retrieval_metrics/ablation/20260311T180351Z/configs/01_colab_v2_chunk_hybrid_c420_o80_k5.yaml",
+  "artifacts_dir": "artifacts",
+  "eval_file": "data/processed_v2_clean_plus/eval_auto_qa.json",
+  "embedding_model": "BAAI/bge-base-en",
+  "retrieval_mode": "hybrid",
+  "top_k": 5,
+  "queries": 200,
+  "hits": 65,
+  "hit_rate": 0.325,
+  "mrr": 0.312917,
+  "offline_flags": {
+    "HF_HUB_OFFLINE": "",
+    "TRANSFORMERS_OFFLINE": "",
+    "HF_DATASETS_OFFLINE": ""
+  }
+}
