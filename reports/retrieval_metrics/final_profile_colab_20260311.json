@@ -1,0 +1,38 @@
+﻿{
+  "profile_name": "colab_retrieval_final_v1",
+  "selected_on_utc": "2026-03-12T00:00:00Z",
+  "selection_rule": "maximize hit_rate first, then mrr",
+  "config": {
+    "retrieval_mode": "hybrid",
+    "chunk_size": 700,
+    "chunk_overlap": 40,
+    "top_k": 5,
+    "embedding_model": "BAAI/bge-base-en"
+  },
+  "evidence": {
+    "topk_run": {
+      "run_id": "20260311T162804Z",
+      "best": {
+        "tag": "colab_v2_topk_hybrid_c520_o80_k5",
+        "hit_rate": 0.33,
+        "mrr": 0.297583
+      }
+    },
+    "chunk_size_run": {
+      "run_id": "20260311T163355Z",
+      "c700_o80_k5": {
+        "hit_rate": 0.33,
+        "mrr": 0.306583
+      }
+    },
+    "overlap_run": {
+      "run_id": "20260311T164926Z",
+      "best": {
+        "tag": "colab_v2_overlap_hybrid_c700_o40_k5",
+        "hit_rate": 0.33,
+        "mrr": 0.3095
+      }
+    }
+  },
+  "notes": "Compared to baseline c520/o80/k5, the selected profile keeps hit_rate and improves MRR."
+}

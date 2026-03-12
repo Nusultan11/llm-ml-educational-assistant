@@ -35,3 +35,12 @@ Automated ablation runs are stored under:
 - `reports/retrieval_metrics/ablation/<run_id>/run_summary.json`
 - `reports/retrieval_metrics/ablation/<run_id>/leaderboard.csv`
 - `reports/retrieval_metrics/ablation/<run_id>/leaderboard.md`
+
+## Final tuned profile (Colab)
+
+- Profile file: `reports/retrieval_metrics/final_profile_colab_20260311.json`
+- Selected config: `hybrid`, `chunk_size=700`, `chunk_overlap=40`, `top_k=5`
+- Selection evidence:
+  - top-k run: `20260311T162804Z`
+  - chunk-size run: `20260311T163355Z`
+  - overlap run: `20260311T164926Z`

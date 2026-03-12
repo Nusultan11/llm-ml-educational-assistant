@@ -1,4 +1,4 @@
-project:
+﻿project:
   name: "llm-ml-assistant"
   version: "0.1"
 
@@ -12,8 +12,8 @@ embeddings:
 
 rag:
   # Colab free-friendly profile: hybrid retrieval + lighter generation model.
-  chunk_size: 520
-  chunk_overlap: 80
+  chunk_size: 700
+  chunk_overlap: 40
   top_k: 5
   retrieval_mode: "hybrid"
   rrf_k: 60
