@@ -1,0 +1,3 @@
+rank,tag,retrieval_mode,chunk_size,chunk_overlap,top_k,queries,hit_rate,mrr,snapshot,pipeline_profile_reused,pipeline_sec,eval_sec,total_sec
+1,colab_mode_vector_c700_o40_k5,vector,700,40,5,200,0.33,0.3095,20260312T141819Z__20260312T141439Z_01_colab_mode_vector_c700_o40_k5,False,220.305,16.953,237.258
+2,colab_mode_hybrid_c700_o40_k5,hybrid,700,40,5,200,0.33,0.3095,20260312T142158Z__20260312T141439Z_02_colab_mode_hybrid_c700_o40_k5,False,201.768,16.968,218.736

@@ -1,0 +1,36 @@
+{
+  "input_dir": "data/processed",
+  "output_dir": "data/processed_v2_clean_plus",
+  "rag_docs_dir": "data/rag_docs_v2_clean_plus",
+  "params": {
+    "min_rag_chars": 120,
+    "min_instruction_chars": 10,
+    "min_response_chars": 80,
+    "max_non_ascii_ratio": 0.3,
+    "noise_pattern": "(?:http[s]?://|<[^>]+>|\\bN/A\\b|\\blorem ipsum\\b)"
+  },
+  "rag": {
+    "before": 9235,
+    "after": 7250,
+    "removed": 1985,
+    "drop_reasons": {
+      "too_short": 1031,
+      "noise": 752,
+      "high_non_ascii_ratio": 197,
+      "duplicate": 5
+    }
+  },
+  "sft": {
+    "before": 5095,
+    "after": 4020,
+    "removed": 1075,
+    "drop_reasons": {
+      "noise": 354,
+      "high_non_ascii_ratio": 151,
+      "response_too_short": 515,
+      "instruction_too_short": 54,
+      "duplicate": 1
+    }
+  },
+  "rag_docs_count": 7250
+}

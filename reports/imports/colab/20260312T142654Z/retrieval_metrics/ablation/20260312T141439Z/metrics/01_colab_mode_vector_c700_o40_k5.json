@@ -1,0 +1,20 @@
+{
+  "created_at_utc": "2026-03-12T14:18:36Z",
+  "tag": "colab_mode_vector_c700_o40_k5",
+  "snapshot_label": "20260312T141819Z__20260312T141439Z_01_colab_mode_vector_c700_o40_k5",
+  "config": "reports/retrieval_metrics/ablation/20260312T141439Z/configs/01_colab_mode_vector_c700_o40_k5.yaml",
+  "artifacts_dir": "artifacts",
+  "eval_file": "data/processed_v2_clean_plus/eval_auto_qa.json",
+  "embedding_model": "BAAI/bge-base-en",
+  "retrieval_mode": "vector",
+  "top_k": 5,
+  "queries": 200,
+  "hits": 66,
+  "hit_rate": 0.33,
+  "mrr": 0.3095,
+  "offline_flags": {
+    "HF_HUB_OFFLINE": "",
+    "TRANSFORMERS_OFFLINE": "",
+    "HF_DATASETS_OFFLINE": ""
+  }
+}
