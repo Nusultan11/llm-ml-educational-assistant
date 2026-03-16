@@ -1,0 +1,23 @@
+project:
+  name: "llm-ml-assistant"
+  version: "0.1"
+
+model:
+  name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+  device: "cpu"
+  max_tokens: 128
+
+embeddings:
+  name: "BAAI/bge-base-en"
+
+rag:
+  chunk_size: 700
+  chunk_overlap: 40
+  top_k: 5
+  retrieval_mode: "hybrid"
+  rrf_k: 60
+
+paths:
+  data_dir: "data/examples"
+  artifacts_dir: "artifacts"
+  logs_dir: "logs"
