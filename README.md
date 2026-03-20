@@ -228,3 +228,25 @@ Tip for quick smoke run:
 ```bash
 python scripts/run_retrieval_ablation.py --max-runs 2 --dry-run
 ```
+
+## Independent manual eval (recommended)
+
+To reduce evaluation bias, keep a separate hand-written QA set.
+
+1. Create manual set from template:
+
+```bash
+copy reports\\eval\\manual_eval_template.json reports\\eval\\manual_eval_v1.json
+```
+
+2. Validate it:
+
+```bash
+python scripts/validate_manual_eval.py --eval reports/eval/manual_eval_v1.json
+```
+
+3. Run retrieval evaluation on this independent set:
+
+```bash
+python scripts/evaluate_artifacts_retrieval.py --config configs/colab_light.yaml --artifacts-dir artifacts --eval reports/eval/manual_eval_v1.json --tag manual_eval_v1 --out reports/retrieval_metrics/manual_eval_v1.json --history-path reports/retrieval_metrics/history.jsonl
+```

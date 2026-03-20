@@ -1,0 +1,42 @@
+﻿[
+  {
+    "query": "What is retrieval-augmented generation (RAG)?",
+    "expected_substring": "retrieval-augmented generation"
+  },
+  {
+    "query": "Why can RAG reduce hallucinations?",
+    "expected_substring": "grounded in retrieved context"
+  },
+  {
+    "query": "What does HitRate@k measure in retrieval?",
+    "expected_substring": "at least one relevant chunk"
+  },
+  {
+    "query": "What does MRR reward in ranking?",
+    "expected_substring": "relevant result appears earlier"
+  },
+  {
+    "query": "When should a model answer 'I do not know'?",
+    "expected_substring": "insufficient context"
+  },
+  {
+    "query": "What is FAISS used for?",
+    "expected_substring": "nearest neighbor search"
+  },
+  {
+    "query": "Why are chunk overlap and chunk size important?",
+    "expected_substring": "preserve context across chunk boundaries"
+  },
+  {
+    "query": "What is the difference between vector and hybrid retrieval?",
+    "expected_substring": "combine semantic and keyword signals"
+  },
+  {
+    "query": "What is contrastive learning in simple words?",
+    "expected_substring": "similar examples close and dissimilar far"
+  },
+  {
+    "query": "What is the role of embedding models in RAG?",
+    "expected_substring": "convert text into vectors"
+  }
+]

@@ -44,3 +44,11 @@ Automated ablation runs are stored under:
   - top-k run: `20260311T162804Z`
   - chunk-size run: `20260311T163355Z`
   - overlap run: `20260311T164926Z`
+
+## Manual eval (independent)
+
+Use a separate hand-written QA set to avoid auto-eval bias:
+
+- Template: `reports/eval/manual_eval_template.json`
+- Validator: `python scripts/validate_manual_eval.py --eval reports/eval/manual_eval_v1.json`
+- Evaluation run: `python scripts/evaluate_artifacts_retrieval.py --config configs/colab_light.yaml --artifacts-dir artifacts --eval reports/eval/manual_eval_v1.json --tag manual_eval_v1 --out reports/retrieval_metrics/manual_eval_v1.json --history-path reports/retrieval_metrics/history.jsonl`
