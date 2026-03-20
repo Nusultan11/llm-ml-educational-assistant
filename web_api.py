@@ -1,6 +1,7 @@
 from pathlib import Path
 import sys
 import os
+import re
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,10 +35,17 @@ def _index_paths(artifacts_dir: Path) -> tuple[Path, Path]:
 
 
 def _extract_assistant_answer(text: str) -> str:
-    marker = "[ASSISTANT]"
-    if marker in text:
-        return text.split(marker, 1)[1].strip()
-    return text.strip()
+    raw = (text or "").strip()
+    if not raw:
+        return ""
+
+    # If model echoes full prompt, keep only the tail after the last assistant tag.
+    if "[ASSISTANT]" in raw:
+        raw = raw.rsplit("[ASSISTANT]", 1)[1].strip()
+
+    # Drop any leaked template tags.
+    raw = re.split(r"\[(?:SYSTEM|CONTEXT|USER|ASSISTANT)\]", raw, maxsplit=1)[0].strip()
+    return raw
 
 
 config_override = os.getenv("LLM_CONFIG_PATH", "").strip()
