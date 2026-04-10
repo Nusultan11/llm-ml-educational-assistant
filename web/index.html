@@ -270,6 +270,117 @@
       border: 1px solid var(--border);
     }
 
+    .bot-meta {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .grounding-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .grounding-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .grounding-badge.good {
+      background: rgba(20, 122, 72, 0.12);
+      color: #0f7a49;
+    }
+
+    .grounding-badge.weak {
+      background: rgba(176, 94, 0, 0.12);
+      color: #a85b00;
+    }
+
+    body.dark-mode .grounding-badge.good {
+      background: rgba(102, 218, 155, 0.16);
+      color: #8ef0be;
+    }
+
+    body.dark-mode .grounding-badge.weak {
+      background: rgba(255, 189, 89, 0.16);
+      color: #ffd089;
+    }
+
+    .grounding-reason {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .sources-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sources-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .source-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .source-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: color-mix(in srgb, var(--chat-bg) 86%, var(--bg-color) 14%);
+    }
+
+    .source-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+
+    .source-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .source-rank {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .source-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .source-snippet {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-main);
+      opacity: 0.92;
+    }
+
     .typing {
       display: inline-flex;
       align-items: center;
@@ -510,10 +621,105 @@
       });
     }
 
-    function appendMessageElement(text, role) {
+    function buildSourceMeta(message) {
+      if (message.role !== "bot") return null;
+      const hasGrounding = !!message.grounding;
+      const hasSources = Array.isArray(message.sources) && message.sources.length > 0;
+      if (!hasGrounding && !hasSources) return null;
+
+      const meta = document.createElement("div");
+      meta.className = "bot-meta";
+
+      if (hasGrounding) {
+        const row = document.createElement("div");
+        row.className = "grounding-row";
+
+        const badge = document.createElement("span");
+        badge.className = `grounding-badge ${message.grounding.grounded ? "good" : "weak"}`;
+        badge.textContent = message.grounding.grounded
+          ? `Grounded • ${message.grounding.evidence_count || 0} sources`
+          : `Weak context • ${message.grounding.evidence_count || 0} sources`;
+        row.appendChild(badge);
+
+        const reason = document.createElement("span");
+        reason.className = "grounding-reason";
+        reason.textContent = message.grounding.reason || "";
+        row.appendChild(reason);
+
+        meta.appendChild(row);
+      }
+
+      if (hasSources) {
+        const wrap = document.createElement("div");
+        wrap.className = "sources-wrap";
+
+        const title = document.createElement("div");
+        title.className = "sources-title";
+        title.textContent = "Sources";
+        wrap.appendChild(title);
+
+        const list = document.createElement("div");
+        list.className = "source-list";
+
+        message.sources.forEach((source) => {
+          const card = document.createElement("div");
+          card.className = "source-card";
+
+          const topline = document.createElement("div");
+          topline.className = "source-topline";
+
+          const name = document.createElement("span");
+          name.className = "source-name";
+          name.textContent = source.source_name || source.doc_id || "Unknown source";
+          topline.appendChild(name);
+
+          const rank = document.createElement("span");
+          rank.className = "source-rank";
+          rank.textContent = `#${source.rank || 0}`;
+          topline.appendChild(rank);
+          card.appendChild(topline);
+
+          const metaLine = document.createElement("div");
+          metaLine.className = "source-meta";
+          const metaParts = [];
+          if (source.title) metaParts.push(source.title);
+          if (source.section && source.section !== source.title) metaParts.push(source.section);
+          if (Array.isArray(source.chunk_ids) && source.chunk_ids.length) {
+            metaParts.push(source.chunk_ids.join(", "));
+          }
+          metaLine.textContent = metaParts.join(" • ");
+          if (metaLine.textContent) card.appendChild(metaLine);
+
+          const snippet = document.createElement("div");
+          snippet.className = "source-snippet";
+          const rawText = (source.text || "").trim();
+          snippet.textContent = rawText.length > 180 ? `${rawText.slice(0, 177)}...` : rawText;
+          if (snippet.textContent) card.appendChild(snippet);
+
+          list.appendChild(card);
+        });
+
+        wrap.appendChild(list);
+        meta.appendChild(wrap);
+      }
+
+      return meta;
+    }
+
+    function appendMessageElement(messageOrText, role) {
+      const message = typeof messageOrText === "string"
+        ? { role, text: messageOrText, sources: [], grounding: null }
+        : messageOrText;
       const div = document.createElement("div");
-      div.className = `message ${role === "user" ? "user-message" : "bot-message"}`;
-      div.textContent = text;
+      div.className = `message ${message.role === "user" ? "user-message" : "bot-message"}`;
+
+      const content = document.createElement("div");
+      content.textContent = message.text;
+      div.appendChild(content);
+
+      const meta = buildSourceMeta(message);
+      if (meta) div.appendChild(meta);
+
       chatContainer.appendChild(div);
       return div;
     }
@@ -522,7 +728,7 @@
       chatContainer.innerHTML = "";
       const chat = activeChat();
       if (!chat) return;
-      chat.messages.forEach(m => appendMessageElement(m.text, m.role));
+      chat.messages.forEach(m => appendMessageElement(m, m.role));
       scrollToBottom();
     }
 
@@ -530,10 +736,10 @@
       chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
     }
 
-    function addMessage(role, text) {
+    function addMessage(role, text, extras = {}) {
       const chat = activeChat();
       if (!chat) return;
-      chat.messages.push({ role, text });
+      chat.messages.push({ role, text, ...extras });
       chat.updatedAt = Date.now();
       if (role === "user" && chat.title === "Новый чат") chat.title = toTitle(text);
       chats.sort((a, b) => b.updatedAt - a.updatedAt);
@@ -542,18 +748,24 @@
       renderHistory();
     }
 
-    async function animateBotText(text) {
-      const msg = appendMessageElement("", "bot");
+    async function animateBotText(message) {
+      const msg = document.createElement("div");
+      msg.className = "message bot-message";
+      const content = document.createElement("div");
+      msg.appendChild(content);
+      chatContainer.appendChild(msg);
       const cursor = document.createElement("span");
       cursor.className = "cursor";
       cursor.textContent = "|";
-      msg.appendChild(cursor);
-      for (const ch of String(text || "")) {
-        msg.insertBefore(document.createTextNode(ch), cursor);
+      content.appendChild(cursor);
+      for (const ch of String(message.text || "")) {
+        content.insertBefore(document.createTextNode(ch), cursor);
         scrollToBottom();
         await new Promise(r => setTimeout(r, 9));
       }
       cursor.remove();
+      const meta = buildSourceMeta(message);
+      if (meta) msg.appendChild(meta);
       scrollToBottom();
     }
 
@@ -586,7 +798,7 @@
       setTyping(true);
 
       try {
-        let reply = "";
+        let botMessage = null;
         if (USE_REAL_API) {
           const response = await fetch(API_URL, {
             method: "POST",
@@ -595,26 +807,40 @@
           });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
-          reply = data.reply || "Пустой ответ от сервера.";
+          botMessage = {
+            role: "bot",
+            text: data.reply || "Empty server response.",
+            sources: Array.isArray(data.sources) ? data.sources : [],
+            grounding: data.grounding || null
+          };
         } else {
           await new Promise(r => setTimeout(r, 900));
-          reply = "Тестовый ответ. Включи USE_REAL_API=true для реального запроса.";
+          botMessage = {
+            role: "bot",
+            text: "Test response. Enable USE_REAL_API=true for live backend answers.",
+            sources: [],
+            grounding: null
+          };
         }
 
         setTyping(false);
-        addMessage("bot", reply);
-        await animateBotText(reply);
+        addMessage("bot", botMessage.text, {
+          sources: botMessage.sources,
+          grounding: botMessage.grounding
+        });
+        await animateBotText(botMessage);
       } catch (err) {
         setTyping(false);
-        const fail = "Ошибка соединения с сервером.";
+        const fail = "Server connection error.";
         addMessage("bot", fail);
-        await animateBotText(fail);
+        await animateBotText({ role: "bot", text: fail, sources: [], grounding: null });
         console.error(err);
       } finally {
         sending = false;
         sendBtn.disabled = false;
       }
     }
+
 
     function toggleSidebar() { sidebar.classList.toggle("collapsed"); }
 

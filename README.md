@@ -83,6 +83,41 @@ Useful flags:
 - `--no-openassistant`, `--no-dolly`
 - cleaning thresholds: `--min-rag-chars`, `--min-instruction-chars`, `--min-response-chars`
 
+## Offline vs online pipeline
+
+This project now treats offline and online work as separate architectural layers.
+
+Offline pipeline:
+- dataset preparation
+- cleaning
+- chunking
+- embedding/index rebuild
+- ablation
+- evaluation
+- artifact snapshotting
+
+Online pipeline:
+- load prebuilt artifacts
+- retrieve
+- rerank
+- quality gate
+- context assembly
+- generate answer
+- return source attribution
+
+Serving must use the prebuilt bundle in `artifacts/`:
+- `rag_index.faiss`
+- `rag_chunks.json`
+- `rag_manifest.json`
+
+Validate that the online bundle is ready:
+
+```bash
+python scripts/validate_serving_bundle.py --artifacts-dir artifacts
+```
+
+The API and question-answering path now use an explicit online serving service that never rebuilds data or the index during a user request.
+
 ## Config profiles (with rationale)
 
 - `configs/dev_cpu.yaml`
@@ -155,6 +190,7 @@ llm-ml-assistant ask "What is RAG?" --config configs/colab_light.yaml --artifact
 Notes:
 - If `--mode rag` fails (OOM/GPU/network), CLI falls back to retrieval-only and prints contexts.
 - `--show-contexts` is useful for debugging and source transparency.
+- Online answering uses only prebuilt artifacts; it does not re-read or re-index source documents.
 
 ## Mini retrieval evaluation
 

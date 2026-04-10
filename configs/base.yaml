@@ -16,6 +16,18 @@ rag:
   top_k: 4
   retrieval_mode: "hybrid"
   rrf_k: 60
+  reranker_enabled: true
+  reranker_type: "token_overlap"
+  reranker_candidate_k: 12
+  quality_gate_enabled: true
+  quality_gate_min_score: 0.35
+  quality_gate_min_coverage: 0.2
+  quality_gate_min_strong_results: 1
+  context_max_blocks: 3
+  context_max_chars: 1800
+  context_max_chunks_per_doc: 2
+  context_dedup_threshold: 0.8
+  context_expand_neighbors: true
 
 paths:
   data_dir: "data/examples"

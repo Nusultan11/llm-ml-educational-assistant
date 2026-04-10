@@ -1,7 +1,6 @@
 from pathlib import Path
 import sys
 import os
-import re
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,8 +13,8 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from llm_ml_assistant.core.prompt_builder import PromptBuilder
-from llm_ml_assistant.core.retriever import Retriever
-from llm_ml_assistant.models.generator import Generator
+from llm_ml_assistant.core.context_assembler import ContextAssembler
+from llm_ml_assistant.core.serving import OnlineRAGService
 from llm_ml_assistant.utils.config import load_config
 
 
@@ -34,18 +33,15 @@ def _index_paths(artifacts_dir: Path) -> tuple[Path, Path]:
     return artifacts_dir / "rag_index.faiss", artifacts_dir / "rag_chunks.json"
 
 
-def _extract_assistant_answer(text: str) -> str:
-    raw = (text or "").strip()
-    if not raw:
-        return ""
-
-    # If model echoes full prompt, keep only the tail after the last assistant tag.
-    if "[ASSISTANT]" in raw:
-        raw = raw.rsplit("[ASSISTANT]", 1)[1].strip()
-
-    # Drop any leaked template tags.
-    raw = re.split(r"\[(?:SYSTEM|CONTEXT|USER|ASSISTANT)\]", raw, maxsplit=1)[0].strip()
-    return raw
+def _build_context_assembler(config) -> ContextAssembler:
+    return ContextAssembler(
+        max_blocks=getattr(config.rag, "context_max_blocks", 3),
+        max_chars=getattr(config.rag, "context_max_chars", 1800),
+        max_chunks_per_doc=getattr(config.rag, "context_max_chunks_per_doc", 2),
+        dedup_threshold=getattr(config.rag, "context_dedup_threshold", 0.8),
+        expand_neighbors=getattr(config.rag, "context_expand_neighbors", True),
+        chunk_size_hint=config.rag.chunk_size,
+    )
 
 
 config_override = os.getenv("LLM_CONFIG_PATH", "").strip()
@@ -55,9 +51,8 @@ else:
     config_path = ROOT_DIR / "configs" / "colab_light.yaml"
 
 config = load_config(config_path)
-retriever = Retriever(config)
 prompt_builder = PromptBuilder()
-generator: Generator | None = None
+context_assembler = _build_context_assembler(config)
 
 artifacts_override = os.getenv("LLM_ARTIFACTS_DIR", "").strip()
 if artifacts_override:
@@ -73,7 +68,12 @@ if not index_path.exists() or not chunks_path.exists():
         f"(index: {index_path}, chunks: {chunks_path})."
     )
 
-retriever.load(index_path=index_path, chunks_path=chunks_path)
+service = OnlineRAGService.from_artifacts(
+    config=config,
+    artifacts_dir=artifacts_dir,
+    prompt_builder=prompt_builder,
+    context_assembler=context_assembler,
+)
 
 app = FastAPI(title="llm-ml-assistant API")
 
@@ -88,13 +88,11 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict:
-    return {"ok": True}
+    return {"ok": True, "serving": service.serving_summary()}
 
 
 @app.post("/ask")
 def ask(request: AskRequest) -> dict:
-    global generator
-
     query = request.query.strip()
     if not query:
         return {"error": "query must not be empty"}
@@ -102,42 +100,12 @@ def ask(request: AskRequest) -> dict:
     if request.mode not in {"retrieval_only", "rag"}:
         return {"error": "mode must be 'retrieval_only' or 'rag'"}
 
-    contexts = retriever.retrieve(query)
-
-    if request.mode == "retrieval_only":
-        return {
-            "mode": request.mode,
-            "answer": "Use retrieved contexts as evidence for the final response.",
-            "contexts": contexts if request.show_contexts else [],
-        }
-
-    try:
-        if generator is None:
-            generator = Generator(
-                model_name=config.model.name,
-                device=config.model.device,
-            )
-
-        prompt = prompt_builder.build(query, contexts)
-        raw_answer = generator.generate(prompt, max_tokens=config.model.max_tokens)
-        answer = _extract_assistant_answer(raw_answer)
-    except Exception as exc:
-        return {
-            "mode": "retrieval_only",
-            "answer": (
-                "RAG generation failed on this machine. "
-                "Returning retrieval-only contexts. "
-                f"Error: {exc}"
-            ),
-            "contexts": contexts if request.show_contexts else [],
-            "rag_error": str(exc),
-        }
-
-    return {
-        "mode": request.mode,
-        "answer": answer,
-        "contexts": contexts if request.show_contexts else [],
-    }
+    result = service.answer(
+        query=query,
+        mode=request.mode,
+        show_contexts=request.show_contexts,
+    )
+    return result.to_dict()
 
 
 @app.post("/api/chat")
@@ -149,4 +117,16 @@ def api_chat(request: ChatRequest) -> dict:
             show_contexts=False,
         )
     )
-    return {"reply": result.get("answer", ""), "mode": result.get("mode", request.mode)}
+    attribution = result.get("attribution", {})
+    return {
+        "reply": result.get("answer", ""),
+        "mode": result.get("mode", request.mode),
+        "sources": result.get("sources", []),
+        "serving": service.serving_summary(),
+        "grounding": {
+            "grounded": attribution.get("grounded", False),
+            "evidence_count": attribution.get("evidence_count", 0),
+            "reason": attribution.get("reason", ""),
+        },
+        "retrieval_quality": result.get("retrieval_quality", {}),
+    }

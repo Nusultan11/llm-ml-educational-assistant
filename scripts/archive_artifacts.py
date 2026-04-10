@@ -36,6 +36,7 @@ def main():
     artifacts_dir = Path(args.artifacts_dir)
     index_path = artifacts_dir / "rag_index.faiss"
     chunks_path = artifacts_dir / "rag_chunks.json"
+    manifest_path = artifacts_dir / "rag_manifest.json"
 
     if not index_path.exists() or not chunks_path.exists():
         raise FileNotFoundError(
@@ -52,9 +53,12 @@ def main():
 
     snap_index = snapshot_dir / "rag_index.faiss"
     snap_chunks = snapshot_dir / "rag_chunks.json"
+    snap_manifest = snapshot_dir / "rag_manifest.json"
 
     shutil.copy2(index_path, snap_index)
     shutil.copy2(chunks_path, snap_chunks)
+    if manifest_path.exists():
+        shutil.copy2(manifest_path, snap_manifest)
 
     chunks = json.loads(snap_chunks.read_text(encoding="utf-8"))
 
@@ -92,6 +96,13 @@ def main():
             },
         },
     }
+
+    if snap_manifest.exists():
+        metadata["artifacts"]["rag_manifest"] = {
+            "path": str(snap_manifest),
+            "size_bytes": snap_manifest.stat().st_size,
+            "sha256": sha256_file(snap_manifest),
+        }
 
     metadata_path = snapshot_dir / "metadata.json"
     metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -170,7 +170,11 @@ def main() -> None:
         ]
         _run_step("Build index", index_cmd, env)
         _ensure_paths_exist(
-            [artifacts_dir / "rag_index.faiss", artifacts_dir / "rag_chunks.json"],
+            [
+                artifacts_dir / "rag_index.faiss",
+                artifacts_dir / "rag_chunks.json",
+                artifacts_dir / "rag_manifest.json",
+            ],
             "Build index",
         )
 

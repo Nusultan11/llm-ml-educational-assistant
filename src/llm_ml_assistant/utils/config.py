@@ -20,6 +20,18 @@ class RAGConfig(BaseModel):
     top_k: int
     retrieval_mode: str = "vector"
     rrf_k: int = 60
+    reranker_enabled: bool = False
+    reranker_type: str = "token_overlap"
+    reranker_candidate_k: int | None = None
+    quality_gate_enabled: bool = False
+    quality_gate_min_score: float = 0.2
+    quality_gate_min_coverage: float = 0.2
+    quality_gate_min_strong_results: int = 1
+    context_max_blocks: int = 3
+    context_max_chars: int = 1800
+    context_max_chunks_per_doc: int = 2
+    context_dedup_threshold: float = 0.8
+    context_expand_neighbors: bool = True
 
 
 class EmbeddingConfig(BaseModel):

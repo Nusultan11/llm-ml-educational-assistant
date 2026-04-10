@@ -35,19 +35,13 @@ def _append_jsonl(path: Path, payload: dict) -> None:
         f.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
 
-def main(
-    config_path: Path = typer.Option(Path("configs/colab_light.yaml"), "--config"),
-    artifacts_dir: Path = typer.Option(Path("artifacts"), "--artifacts-dir"),
-    eval_path: Path = typer.Option(Path("data/processed_v2_clean/eval_auto_qa.json"), "--eval"),
-    out_path: Path | None = typer.Option(None, "--out", help="Optional JSON file to save metrics."),
-    history_path: Path | None = typer.Option(
-        None,
-        "--history-path",
-        help="Optional JSONL file to append one metrics record per run.",
-    ),
-    snapshot_label: str = typer.Option("", "--snapshot-label", help="Snapshot id/label for traceability."),
-    tag: str = typer.Option("", "--tag", help="Short run tag, e.g. baseline/v2_clean_plus."),
-):
+def evaluate_artifacts_retrieval(
+    config_path: Path,
+    artifacts_dir: Path,
+    eval_path: Path,
+    snapshot_label: str = "",
+    tag: str = "",
+) -> dict:
     config = load_config(config_path)
     index_path = artifacts_dir / "rag_index.faiss"
     chunks_path = artifacts_dir / "rag_chunks.json"
@@ -75,7 +69,7 @@ def main(
     hit_rate = hits / total
     mrr = reciprocal_rank_sum / total
 
-    result = {
+    return {
         "created_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "tag": tag,
         "snapshot_label": snapshot_label,
@@ -84,6 +78,20 @@ def main(
         "eval_file": str(eval_path),
         "embedding_model": config.embeddings.name,
         "retrieval_mode": getattr(config.rag, "retrieval_mode", "vector"),
+        "chunk_size": config.rag.chunk_size,
+        "chunk_overlap": config.rag.chunk_overlap,
+        "reranker_enabled": getattr(config.rag, "reranker_enabled", False),
+        "reranker_type": getattr(config.rag, "reranker_type", "token_overlap"),
+        "reranker_candidate_k": getattr(config.rag, "reranker_candidate_k", None),
+        "quality_gate_enabled": getattr(config.rag, "quality_gate_enabled", False),
+        "quality_gate_min_score": getattr(config.rag, "quality_gate_min_score", 0.0),
+        "quality_gate_min_coverage": getattr(config.rag, "quality_gate_min_coverage", 0.0),
+        "quality_gate_min_strong_results": getattr(config.rag, "quality_gate_min_strong_results", 0),
+        "context_max_blocks": getattr(config.rag, "context_max_blocks", 0),
+        "context_max_chars": getattr(config.rag, "context_max_chars", 0),
+        "context_max_chunks_per_doc": getattr(config.rag, "context_max_chunks_per_doc", 0),
+        "context_dedup_threshold": getattr(config.rag, "context_dedup_threshold", 0.0),
+        "context_expand_neighbors": getattr(config.rag, "context_expand_neighbors", False),
         "top_k": config.rag.top_k,
         "queries": total,
         "hits": hits,
@@ -96,12 +104,34 @@ def main(
         },
     }
 
+
+def main(
+    config_path: Path = typer.Option(Path("configs/colab_light.yaml"), "--config"),
+    artifacts_dir: Path = typer.Option(Path("artifacts"), "--artifacts-dir"),
+    eval_path: Path = typer.Option(Path("data/processed_v2_clean/eval_auto_qa.json"), "--eval"),
+    out_path: Path | None = typer.Option(None, "--out", help="Optional JSON file to save metrics."),
+    history_path: Path | None = typer.Option(
+        None,
+        "--history-path",
+        help="Optional JSONL file to append one metrics record per run.",
+    ),
+    snapshot_label: str = typer.Option("", "--snapshot-label", help="Snapshot id/label for traceability."),
+    tag: str = typer.Option("", "--tag", help="Short run tag, e.g. baseline/v2_clean_plus."),
+):
+    result = evaluate_artifacts_retrieval(
+        config_path=config_path,
+        artifacts_dir=artifacts_dir,
+        eval_path=eval_path,
+        snapshot_label=snapshot_label,
+        tag=tag,
+    )
+
     print(f"Config: {config_path}")
     print(f"Artifacts dir: {artifacts_dir}")
     print(f"Eval file: {eval_path}")
-    print(f"Queries: {total}")
-    print(f"HitRate@{config.rag.top_k}: {hit_rate:.3f}")
-    print(f"MRR@{config.rag.top_k}: {mrr:.3f}")
+    print(f"Queries: {result['queries']}")
+    print(f"HitRate@{result['top_k']}: {result['hit_rate']:.3f}")
+    print(f"MRR@{result['top_k']}: {result['mrr']:.3f}")
 
     if out_path is not None:
         _write_json(out_path, result)
