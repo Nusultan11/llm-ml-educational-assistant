@@ -15,13 +15,11 @@ def first_snippet(text: str, min_len: int, max_len: int) -> str:
         return t
 
     cut = t[:max_len]
-    # Try to end on sentence boundary for better readability.
     for sep in [". ", "? ", "! ", "; "]:
         idx = cut.rfind(sep)
         if idx >= min_len:
             return cut[: idx + 1]
 
-    # Fallback to last space.
     space_idx = cut.rfind(" ")
     if space_idx >= min_len:
         return cut[:space_idx]
@@ -75,6 +73,7 @@ def build_eval(
 
     return {
         "sft_path": str(sft_path),
+        "sft_split_role": "eval_holdout",
         "out_path": str(out_path),
         "items": len(eval_items),
         "seed": seed,
@@ -82,8 +81,10 @@ def build_eval(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build auto eval QA file from cleaned SFT dataset.")
-    parser.add_argument("--sft-path", default="data/processed_v2_clean/sft_instructions.jsonl")
+    parser = argparse.ArgumentParser(
+        description="Build auto eval QA file from holdout SFT split."
+    )
+    parser.add_argument("--sft-path", default="data/processed_v2_clean/splits/sft_eval_holdout.jsonl")
     parser.add_argument("--out", default="data/processed_v2_clean/eval_auto_qa.json")
     parser.add_argument("--max-items", type=int, default=200)
     parser.add_argument("--min-instruction-chars", type=int, default=20)

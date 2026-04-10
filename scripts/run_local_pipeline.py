@@ -40,6 +40,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--processed-dir", default="data/processed")
     parser.add_argument("--processed-clean-dir", default="data/processed_v2_clean")
     parser.add_argument("--rag-docs-dir", default="data/rag_docs_v2_clean")
+    parser.add_argument("--splits-dir", default="data/processed_v2_clean/splits")
+    parser.add_argument("--auto-eval-path", default="data/processed_v2_clean/eval_auto_qa.json")
 
     parser.add_argument("--max-openassistant", type=int, default=30000)
     parser.add_argument("--max-dolly", type=int, default=15000)
@@ -61,6 +63,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--skip-prepare", action="store_true")
     parser.add_argument("--skip-clean", action="store_true")
+    parser.add_argument("--skip-split", action="store_true")
+    parser.add_argument("--skip-eval-build", action="store_true")
     parser.add_argument("--skip-index", action="store_true")
     parser.add_argument("--skip-archive", action="store_true")
 
@@ -81,6 +85,8 @@ def main() -> None:
     processed_dir = root / args.processed_dir
     processed_clean_dir = root / args.processed_clean_dir
     rag_docs_dir = root / args.rag_docs_dir
+    splits_dir = root / args.splits_dir
+    auto_eval_path = root / args.auto_eval_path
     artifacts_dir = root / args.artifacts_dir
     config_path = root / args.config
 
@@ -152,6 +158,38 @@ def main() -> None:
             "Clean datasets",
         )
 
+    if not args.skip_split:
+        split_cmd = [
+            python_exec,
+            str(root / "scripts" / "build_holdout_split.py"),
+            "--sft-path",
+            str(processed_clean_dir / "sft_instructions.jsonl"),
+            "--out-dir",
+            args.splits_dir,
+        ]
+        _run_step("Build holdout split", split_cmd, env)
+        _ensure_paths_exist(
+            [
+                splits_dir / "sft_train.jsonl",
+                splits_dir / "sft_dev.jsonl",
+                splits_dir / "sft_eval_holdout.jsonl",
+                splits_dir / "split_summary.json",
+            ],
+            "Build holdout split",
+        )
+
+    if not args.skip_eval_build and not args.skip_split:
+        eval_cmd = [
+            python_exec,
+            str(root / "scripts" / "build_eval_from_cleaned.py"),
+            "--sft-path",
+            str(splits_dir / "sft_eval_holdout.jsonl"),
+            "--out",
+            args.auto_eval_path,
+        ]
+        _run_step("Build auto eval from holdout", eval_cmd, env)
+        _ensure_paths_exist([auto_eval_path], "Build auto eval from holdout")
+
     if not args.skip_index:
         Path(args.artifacts_dir).mkdir(parents=True, exist_ok=True)
 
@@ -199,6 +237,8 @@ def main() -> None:
     print("\nPipeline finished successfully.")
     print(f"Processed: {processed_dir}")
     print(f"Cleaned:   {processed_clean_dir}")
+    print(f"Splits:    {splits_dir}")
+    print(f"Auto eval: {auto_eval_path}")
     print(f"RAG docs:  {rag_docs_dir}")
     print(f"Artifacts: {artifacts_dir}")
 
