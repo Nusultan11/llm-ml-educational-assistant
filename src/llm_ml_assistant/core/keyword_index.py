@@ -67,4 +67,4 @@ class KeywordIndex:
         return score
 
     def _tokenize(self, text: str) -> list[str]:
-        return re.findall(r"\\w+", text.lower())
+        return re.findall(r"\w+", text.lower())
